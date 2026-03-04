@@ -1,0 +1,146 @@
+/*
+  Reset + базовая типографика для проекта.
+  Идея: минимально «ломаем» нативное поведение, но убираем шум браузера.
+*/
+
+/* Нормализация блочной модели */
+*,
+::before,
+::after {
+    box-sizing: border-box;
+}
+
+/* Базовые высоты и плавный скролл */
+html {
+    height: 100%;
+    scrollbar-gutter: stable;
+    scroll-behavior: smooth;
+}
+
+/* Базовые отступы */
+body,
+:where(blockquote, figure, fieldset):where([class]) {
+    margin: 0;
+}
+
+/* Списки с class сами управляют отступами/маркерами */
+:where(ul, ol):where([class]) {
+    padding-left: 0;
+}
+
+:where(ul[class]) {
+    list-style: none;
+}
+
+/* Сбрасываем вертикальные отступы у классовых текстовых блоков */
+:where(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    ul,
+    ol,
+    dl
+):where([class]) {
+    margin-block: 0;
+}
+
+:where(dd[class]) {
+    margin-left: 0;
+}
+
+:where(fieldset[class]) {
+    padding: 0;
+    border: none;
+}
+
+:where(address[class]) {
+    font-style: normal;
+}
+
+/* Параграфы без class получают аккуратный ритм */
+p {
+    --paragraph-margin-bottom: 1.5rem;
+    margin-block: 0;
+}
+
+p:where(:not([class]):not(:last-child)) {
+    margin-bottom: var(--paragraph-margin-bottom);
+}
+
+body {
+    min-height: 100%;
+    line-height: 1.5;
+    font-family: var(--font-family);
+    font-optical-sizing: auto;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* Медиа */
+img,
+video {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Инпуты наследуют типографику */
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+/* Ссылки и интерактив */
+a {
+    color: inherit;
+}
+
+a:where([class]) {
+    display: inline-flex;
+}
+
+button,
+label {
+    cursor: pointer;
+}
+
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Единый цвет SVG при отсутствии специальных значений */
+:where([fill]:not([fill='none'], [fill^='url'])) {
+    fill: currentColor;
+}
+
+:where([stroke]:not([stroke='none'], [stroke^='url'])) {
+    stroke: currentColor;
+}
+
+svg * {
+    transition-property: fill, stroke;
+}
+
+/* Таблицы */
+:where(table) {
+    border-collapse: collapse;
+    border-color: currentColor;
+}
+
+/* Предпочтение снижения анимации */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

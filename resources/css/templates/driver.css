@@ -1,0 +1,433 @@
+/* ============================================================
+   Driver Panel — Панель водителя
+   ============================================================ */
+
+.driver-body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+    min-height: 100vh;
+    color: var(--ad-text);
+}
+
+/* Portal wrapper */
+.driver-portal {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ---- Header ---- */
+.driver-header {
+    width: 100%;
+    background: linear-gradient(180deg, #0f2d5e 0%, #1e40af 100%);
+    box-shadow: 0 10px 15px rgba(0,0,0,.1), 0 4px 6px rgba(0,0,0,.1);
+    padding: 32px 0 24px;
+}
+
+.driver-header__inner {
+    width: 448px;
+    max-width: calc(100% - 48px);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.driver-header__logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.driver-header__logo-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.driver-header__logo-text {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 32px;
+}
+
+.driver-header__subtitle {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #93c5fd;
+    line-height: 20px;
+    text-align: center;
+}
+
+/* ---- Main content ---- */
+.driver-main {
+    width: 448px;
+    max-width: calc(100% - 48px);
+    padding: 32px 0 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ---- Progress bar ---- */
+.driver-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.driver-progress__labels {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.driver-progress__label,
+.driver-progress__value {
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    line-height: 16px;
+}
+
+.driver-progress__bar {
+    height: 12px;
+    background: #e2e8f0;
+    border-radius: 9999px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,.05);
+}
+
+.driver-progress__fill {
+    height: 100%;
+    background: linear-gradient(180deg, #16a34a 0%, #22c55e 100%);
+    border-radius: 9999px;
+    min-width: 0;
+    transition: width 0.3s ease;
+}
+
+/* ---- Card ---- */
+.driver-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 15px rgba(0,0,0,.1), 0 4px 6px rgba(0,0,0,.1);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.driver-card__heading {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    line-height: 20px;
+    letter-spacing: 0.35px;
+    text-transform: uppercase;
+}
+
+.driver-card__heading--with-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.driver-card__heading-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.driver-card__items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.driver-card__row {
+    display: flex;
+    gap: 16px;
+}
+
+.driver-card__row .driver-card__item {
+    flex: 1;
+}
+
+.driver-card__item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.driver-card__icon-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 16px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.driver-card__icon-wrap.is-blue   { background: #dbeafe; }
+.driver-card__icon-wrap.is-purple { background: #f3e8ff; }
+.driver-card__icon-wrap.is-green  { background: #dcfce7; }
+.driver-card__icon-wrap.is-yellow { background: #fef3c7; }
+
+.driver-card__icon {
+    width: 20px;
+    height: 20px;
+}
+
+.driver-card__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.driver-card__info-label {
+    font-size: 12px;
+    font-weight: 400;
+    color: #64748b;
+    line-height: 16px;
+}
+
+.driver-card__info-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 24px;
+}
+
+.driver-card__info-sub {
+    font-size: 14px;
+    font-weight: 400;
+    color: #64748b;
+    line-height: 20px;
+}
+
+/* ---- Route ---- */
+.driver-route {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.driver-route__point {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.driver-route__badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 9999px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 16px;
+}
+
+.driver-route__badge.is-blue  { background: #dbeafe; color: #1d4ed8; }
+.driver-route__badge.is-green { background: #dcfce7; color: #16a34a; }
+
+.driver-route__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.driver-route__label {
+    font-size: 12px;
+    font-weight: 400;
+    color: #64748b;
+    line-height: 16px;
+}
+
+.driver-route__address {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 20px;
+}
+
+.driver-route__arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.driver-route__arrow img {
+    width: 24px;
+    height: 24px;
+}
+
+/* ---- Start button ---- */
+.driver-start-btn {
+    width: 100%;
+    background: linear-gradient(180deg, #1d4ed8 0%, #2563eb 100%);
+    border: none;
+    border-radius: 24px;
+    padding: 24px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 25px 50px rgba(0,0,0,.25);
+    transition: opacity 0.15s, transform 0.1s;
+}
+
+.driver-start-btn:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+}
+
+.driver-start-btn:active {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* State 2 — En route to pickup (purple) */
+.driver-start-btn.is-en-route {
+    background: linear-gradient(180deg, #9333ea 0%, #a855f7 100%);
+}
+
+/* State 3 — Loading cargo (purple + spinner) */
+.driver-start-btn.is-loading {
+    background: linear-gradient(180deg, #7e22ce 0%, #9333ea 100%);
+    cursor: default;
+}
+
+.driver-start-btn.is-loading:hover {
+    opacity: 1;
+    transform: none;
+}
+
+/* State 4 — In transit (orange) */
+.driver-start-btn.is-transit {
+    background: linear-gradient(180deg, #ea580c 0%, #f97316 100%);
+}
+
+/* State 5 — Unloading (teal) */
+.driver-start-btn.is-unloading {
+    background: linear-gradient(180deg, #0f766e 0%, #14b8a6 100%);
+}
+
+/* State 6 — Done (green, disabled) */
+.driver-start-btn.is-done {
+    background: linear-gradient(180deg, #16a34a 0%, #22c55e 100%);
+    cursor: default;
+}
+
+.driver-start-btn.is-done:hover {
+    opacity: 1;
+    transform: none;
+}
+
+/* Spinning animation for loading icon */
+@keyframes driver-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.driver-start-btn__icon--spin {
+    animation: driver-spin 1.2s linear infinite;
+}
+
+.driver-start-btn__icon {
+    width: 48px;
+    height: 48px;
+}
+
+.driver-start-btn__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 32px;
+    text-align: center;
+}
+
+.driver-start-btn__sub {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255,255,255,.9);
+    line-height: 20px;
+    text-align: center;
+}
+
+/* ---- Order number ---- */
+.driver-order-num {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+}
+
+.driver-order-num__label {
+    font-size: 12px;
+    font-weight: 400;
+    color: #64748b;
+    line-height: 16px;
+    text-align: center;
+}
+
+.driver-order-num__value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 20px;
+    text-align: center;
+}
+
+/* ---- Support ---- */
+.driver-support {
+    background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.driver-support__text {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    line-height: 20px;
+    text-align: center;
+}
+
+.driver-support__phone {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #1d4ed8 0%, #2563eb 100%);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24px;
+    text-decoration: none;
+    border-radius: 16px;
+    padding: 12px 24px;
+    transition: opacity 0.15s;
+}
+
+.driver-support__phone:hover {
+    opacity: 0.9;
+}

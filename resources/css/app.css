@@ -1,0 +1,15 @@
+/* Base layers */
+@import './base/fonts.css';
+@import './base/root.css';
+@import './base/reset.css';
+
+/* Template styles */
+@import './templates/layout.css';
+@import './templates/auth.css';
+@import './templates/dashboard.css';
+@import './templates/orders.css';
+@import './templates/counterparties.css';
+@import './templates/counterparties-create.css';
+@import './templates/counterparties-show.css';
+@import './templates/driver.css';
+@import './templates/settings.css';

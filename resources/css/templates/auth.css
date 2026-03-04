@@ -1,0 +1,442 @@
+.ad-auth-body {
+    margin: 0;
+    min-height: 100vh;
+    background: #f0f7ff;
+    color: var(--ad-text);
+}
+
+.ad-auth-layout {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 52.001% 47.999%;
+}
+
+.ad-auth-hero {
+    position: relative;
+    overflow: hidden;
+    background: #0f2d5e;
+    padding: 40px 48px;
+    display: flex;
+    flex-direction: column;
+}
+
+.ad-auth-hero__glow {
+    position: absolute;
+    border-radius: 999px;
+    pointer-events: none;
+}
+
+.ad-auth-hero__glow--top {
+    width: 320px;
+    height: 320px;
+    left: -128px;
+    top: -128px;
+    background: rgba(29, 78, 216, 0.2);
+    filter: blur(64px);
+}
+
+.ad-auth-hero__glow--bottom {
+    width: 384px;
+    height: 384px;
+    right: -96px;
+    bottom: -84px;
+    background: rgba(34, 197, 94, 0.13);
+    filter: blur(64px);
+}
+
+.ad-auth-hero__brand {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ad-auth-hero__logo {
+    width: 44px;
+    height: 44px;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 16px;
+    background: rgba(34, 197, 94, 0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #22c55e;
+}
+
+.ad-auth-hero__logo svg {
+    width: 24px;
+    height: 24px;
+}
+
+.ad-auth-hero__brand-title {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    line-height: 18px;
+    font-weight: 700;
+}
+
+.ad-auth-hero__brand-subtitle {
+    margin: 2px 0 0;
+    color: #93c5fd;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.ad-auth-hero__content {
+    position: relative;
+    z-index: 2;
+    margin-top: auto;
+    margin-bottom: auto;
+    max-width: 530px;
+}
+
+.ad-auth-hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 30px;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    border-radius: 999px;
+    padding: 0 12px;
+    color: #86efac;
+    font-size: 12px;
+    font-weight: 500;
+    background: rgba(34, 197, 94, 0.15);
+}
+
+.ad-auth-hero__badge span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+}
+
+.ad-auth-hero__title {
+    margin: 18px 0 0;
+    color: #fff;
+    font-size: 36px;
+    line-height: 45px;
+    font-weight: 700;
+}
+
+.ad-auth-hero__title em {
+    color: #22c55e;
+    font-style: normal;
+}
+
+.ad-auth-hero__text {
+    margin: 16px 0 0;
+    max-width: 376px;
+    color: #93c5fd;
+    font-size: 16px;
+    line-height: 26px;
+}
+
+.ad-auth-hero__list {
+    margin: 32px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ad-auth-hero__list li {
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ad-auth-hero__list-icon {
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(29, 78, 216, 0.5);
+    border-radius: 12px;
+    background: rgba(29, 78, 216, 0.4);
+    flex: 0 0 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #93c5fd;
+}
+
+.ad-auth-hero__list-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.ad-auth-hero__stats {
+    position: relative;
+    z-index: 2;
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.ad-auth-hero__stats article {
+    height: 72px;
+    border: 1px solid rgba(29, 78, 216, 0.3);
+    border-radius: 16px;
+    background: rgba(29, 78, 216, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.ad-auth-hero__stats strong {
+    color: #fff;
+    font-size: 26px;
+    line-height: 28px;
+    font-weight: 700;
+}
+
+.ad-auth-hero__stats span {
+    margin-top: 2px;
+    color: #93c5fd;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.ad-auth-panel {
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.ad-auth-panel__inner {
+    width: 448px;
+    min-height: 630px;
+    display: flex;
+    flex-direction: column;
+}
+
+.ad-auth-panel__head {
+    margin-bottom: 28px;
+}
+
+.ad-auth-title {
+    margin: 0;
+    color: #1e293b;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 700;
+}
+
+.ad-auth-subtitle {
+    margin: 6px 0 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.ad-auth-card {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 33px;
+}
+
+.ad-auth-alert {
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: #fff0f0;
+    border: 1px solid #f4b5b5;
+    color: #9a1f1f;
+    font-size: 14px;
+}
+
+.ad-auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.ad-auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ad-auth-field label {
+    color: #1e293b;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+}
+
+.ad-auth-field__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ad-auth-link {
+    color: #1d4ed8;
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.ad-auth-link[aria-disabled='true'] {
+    cursor: default;
+}
+
+.ad-auth-input-wrap {
+    position: relative;
+}
+
+.ad-auth-input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+}
+
+.ad-auth-input-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.ad-auth-input-wrap input {
+    width: 100%;
+    height: 46px;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: #f8fafc;
+    color: #1e293b;
+    font-size: 14px;
+    line-height: 20px;
+    padding: 0 16px 0 40px;
+}
+
+.ad-auth-input-wrap input::placeholder {
+    color: #cbd5e1;
+}
+
+.ad-auth-input-wrap input:focus {
+    border-color: #2a62d9;
+    box-shadow: 0 0 0 3px rgba(42, 98, 217, 0.15);
+}
+
+.ad-auth-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+}
+
+.ad-auth-check input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+}
+
+.ad-auth-submit {
+    height: 48px;
+    border: 0;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #1d4ed8 0%, #2563eb 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ad-auth-submit:hover {
+    filter: brightness(1.03);
+}
+
+.ad-auth-submit__icon {
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ad-auth-submit__icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.ad-auth-panel__footer {
+    margin: auto 0 0;
+    padding-top: 20px;
+    color: #94a3b8;
+    font-size: 12px;
+    line-height: 16px;
+    text-align: center;
+    width: 358px;
+    align-self: center;
+}
+
+@media (max-width: 1260px) {
+    .ad-auth-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .ad-auth-hero {
+        min-height: 560px;
+    }
+
+    .ad-auth-panel {
+        padding: 40px 16px;
+    }
+
+    .ad-auth-panel__inner {
+        min-height: auto;
+        width: min(448px, 100%);
+    }
+}
+
+@media (max-width: 760px) {
+    .ad-auth-hero {
+        padding: 24px 16px;
+    }
+
+    .ad-auth-hero__title {
+        font-size: 34px;
+        line-height: 1.2;
+    }
+
+    .ad-auth-hero__stats {
+        grid-template-columns: 1fr;
+    }
+
+    .ad-auth-title {
+        font-size: 28px;
+        line-height: 1.2;
+    }
+
+    .ad-auth-card {
+        padding: 20px;
+    }
+}
