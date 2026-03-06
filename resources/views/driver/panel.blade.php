@@ -16,7 +16,7 @@
         <header class="driver-header">
             <div class="driver-header__inner">
                 <div class="driver-header__logo">
-                    <img src="{{ asset('images/driver/icon-logo.svg') }}" alt="Авто Доставка" class="driver-header__logo-icon">
+                    <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true" class="driver-header__logo-icon"><use href="/icons/sprite.svg#icon-truck"></use></svg>
                     <span class="driver-header__logo-text">Авто Доставка</span>
                 </div>
                 <p class="driver-header__subtitle">Панель водителя</p>
@@ -46,7 +46,7 @@
                     {{-- Driver --}}
                     <div class="driver-card__item">
                         <div class="driver-card__icon-wrap is-blue">
-                            <img src="{{ asset('images/driver/icon-driver.svg') }}" alt="" class="driver-card__icon">
+                            <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true" class="driver-card__icon"><use href="/icons/sprite.svg#icon-doc-man"></use></svg>
                         </div>
                         <div class="driver-card__info">
                             <span class="driver-card__info-label">Водитель</span>
@@ -57,7 +57,7 @@
                     {{-- Vehicle --}}
                     <div class="driver-card__item">
                         <div class="driver-card__icon-wrap is-purple">
-                            <img src="{{ asset('images/driver/icon-truck.svg') }}" alt="" class="driver-card__icon">
+                            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true" class="driver-card__icon"><use href="/icons/sprite.svg#icon-truck"></use></svg>
                         </div>
                         <div class="driver-card__info">
                             <span class="driver-card__info-label">Транспорт</span>
@@ -70,7 +70,7 @@
                     <div class="driver-card__row">
                         <div class="driver-card__item">
                             <div class="driver-card__icon-wrap is-green">
-                                <img src="{{ asset('images/driver/icon-calendar.svg') }}" alt="" class="driver-card__icon">
+                                <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true" class="driver-card__icon"><use href="/icons/sprite.svg#icon-doc-date"></use></svg>
                             </div>
                             <div class="driver-card__info">
                                 <span class="driver-card__info-label">Дата</span>
@@ -79,7 +79,7 @@
                         </div>
                         <div class="driver-card__item">
                             <div class="driver-card__icon-wrap is-yellow">
-                                <img src="{{ asset('images/driver/icon-clock.svg') }}" alt="" class="driver-card__icon">
+                                <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true" class="driver-card__icon"><use href="/icons/sprite.svg#icon-time"></use></svg>
                             </div>
                             <div class="driver-card__info">
                                 <span class="driver-card__info-label">Время</span>
@@ -94,7 +94,7 @@
             {{-- Route card --}}
             <div class="driver-card">
                 <h2 class="driver-card__heading driver-card__heading--with-icon">
-                    <img src="{{ asset('images/driver/icon-route.svg') }}" alt="" class="driver-card__heading-icon">
+                    <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true" class="driver-card__heading-icon"><use href="/icons/sprite.svg#icon-doc-place"></use></svg>
                     Маршрут
                 </h2>
 
@@ -108,7 +108,7 @@
                     </div>
 
                     <div class="driver-route__arrow">
-                        <img src="{{ asset('images/driver/icon-arrow-down.svg') }}" alt="">
+                        <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use href="/icons/sprite.svg#icon-driver-arrow"></use></svg>
                     </div>
 
                     <div class="driver-route__point">
@@ -122,10 +122,10 @@
             </div>
 
             {{-- Action button (state machine) --}}
-            <button type="button" id="driver-action-btn" class="driver-start-btn">
-                <img id="driver-btn-icon" src="{{ asset('images/driver/icon-start.svg') }}" alt="" class="driver-start-btn__icon">
-                <span id="driver-btn-title" class="driver-start-btn__title">Начать перевозку</span>
-                <span id="driver-btn-sub" class="driver-start-btn__sub">Нажмите для начала доставки</span>
+            <button type="button" id="driver-action-btn" class="ad-btn">
+                <svg id="driver-btn-icon" viewBox="0 0 24 24" focusable="false" aria-hidden="true"><use id="driver-btn-icon-use" href="/icons/sprite.svg#icon-truck"></use></svg>
+                <span id="driver-btn-title">Начать перевозку</span>
+                <span id="driver-btn-sub">Нажмите для начала доставки</span>
             </button>
 
             {{-- Order number --}}
@@ -138,7 +138,8 @@
             <div class="driver-support">
                 <p class="driver-support__text">Если возникли вопросы, звоните диспетчеру:</p>
                 <a href="tel:+78000000000" class="driver-support__phone">
-                    📞 +7 (800) 000-00-00
+                    <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true" class="driver-support__phone-icon"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg>
+                    <span>+7 (800) 000-00-00</span>
                 </a>
             </div>
 
@@ -147,8 +148,8 @@
 
     <script>
         (function () {
-            var ICON_START   = '{{ asset("images/driver/icon-start.svg") }}';
-            var ICON_LOADING = '{{ asset("images/driver/icon-loading.svg") }}';
+            var ICON_START   = '/icons/sprite.svg#icon-truck';
+            var ICON_LOADING = '/icons/sprite.svg#icon-truck';
 
             // State machine
             // Each state: what the button shows AFTER entering this state
@@ -221,6 +222,7 @@
 
             var btn          = document.getElementById('driver-action-btn');
             var btnIcon      = document.getElementById('driver-btn-icon');
+            var btnIconUse   = document.getElementById('driver-btn-icon-use');
             var btnTitle     = document.getElementById('driver-btn-title');
             var btnSub       = document.getElementById('driver-btn-sub');
             var progressFill = document.getElementById('driver-progress-fill');
@@ -235,9 +237,9 @@
                 if (s.color) btn.classList.add(s.color);
 
                 // Update icon + spin
-                btnIcon.src = s.icon;
-                btnIcon.classList.toggle('driver-start-btn__icon--spin', s.spin);
-
+                if (btnIconUse) {
+                    btnIconUse.setAttribute('href', s.icon);
+                }
                 // Update text
                 btnTitle.textContent = s.title;
                 btnSub.textContent   = s.sub;

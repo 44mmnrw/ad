@@ -1,15 +1,181 @@
 :root {
+     /* ==========================================================
+         Типографика
+        ========================================================== */
+
+     /* Основной стек sans-serif для всего интерфейса */
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+     /* Токен, который используем в reset/body и в шаблонах */
     --font-family: var(--font-sans);
 
+     /* Вертикальный ритм абзацев без class (см. reset.css) */
+     --paragraph-margin-bottom: 1.5rem;
+
+    /* Единый стиль заголовков H1 (используется классом .ad-h1 в base/typography.css) */
+    --ad-h1-margin: 0;
+    --ad-h1-font-size: 2rem;
+    --ad-h1-line-height: 1.2;
+    --ad-h1-font-weight: 700;
+    --ad-h1-color: var(--ad-slate-900);
+
+     /* ==========================================================
+         Брендовая палитра (основные фирменные цвета АвтоДост)
+        ========================================================== */
+
+     /* Глубокий тёмно-синий для шапки/сайдбара и крупных акцентов */
     --ad-blue-900: #12326d;
+
+     /* Дополнительный тёмно-синий уровень (переходы/альтернативный фон) */
     --ad-blue-800: #1c3e7f;
+
+     /* Основной активный синий (кнопки, фокус, активные элементы) */
     --ad-blue-700: #2b63de;
+
+     /* ==========================================================
+         Базовые поверхности и текст
+        ========================================================== */
+
+     /* Фон страницы/области приложения */
     --ad-bg: #ecf0f7;
+
+     /* Основная «бумага» карточек и контролов */
     --ad-white: #ffffff;
+
+     /* Базовый цвет границ карточек/таблиц/инпутов */
     --ad-border: #c7d0dc;
+
+     /* Основной текст интерфейса */
     --ad-text: #1f2a3d;
+
+     /* Вторичный текст, подписи и вспомогательная информация */
     --ad-muted: #728199;
+
+     /* Позитивный/успешный цвет */
     --ad-green: #1ea44b;
+
+     /* ==========================================================
+         Расширенная нейтральная шкала (часто повторяется в шаблонах)
+        ========================================================== */
+
+     /* Нейтральные тона для текстов и UI-обводок (Slate-like палитра) */
+     --ad-slate-900: #1e293b;
+     --ad-slate-800: #334155;
+     --ad-slate-600: #475569;
+     --ad-slate-500: #64748b;
+     --ad-slate-400: #94a3b8;
+     --ad-slate-300: #cbd5e1;
+     --ad-slate-200: #e2e8f0;
+     --ad-slate-100: #f1f5f9;
+     --ad-slate-050: #f8fafc;
+
+     /* ==========================================================
+         Акцентные и статусные цвета (цветовые роли)
+        ========================================================== */
+
+     /* Primary CTA / ссылки / активные табы */
+     --ad-primary: #1d4ed8;
+     --ad-primary-600: #2563eb;
+
+     /* Success */
+     --ad-success: #16a34a;
+     --ad-success-500: #22c55e;
+
+     /* Warning / attention */
+     --ad-warning: #d97706;
+     --ad-warning-deep: #b45309;
+
+     /* Error / destructive */
+     --ad-danger: #dc2626;
+     --ad-danger-strong: #fb2c36;
+    --ad-danger-dark: #991b1b;
+    --ad-danger-deep: #9a1f1f;
+
+     /* Info */
+     --ad-info: #0369a1;
+
+    /* Дополнительные акцентные оттенки (исторически использовались в шаблонах) */
+    --ad-primary-alt: #2d59d6;
+    --ad-primary-contrast-soft: #d9e4ff;
+    --ad-primary-contrast-strong: #f4f8ff;
+    --ad-primary-deep: #0f2d5e;
+    --ad-primary-deeper: #1e40af;
+    --ad-primary-mid: #2f61dd;
+    --ad-primary-light: #7f9fe6;
+    --ad-primary-muted: #6f89bc;
+    --ad-primary-soft-border: #c7d4e3;
+    --ad-primary-soft-2: #f8fbff;
+    --ad-success-deep: #15803d;
+    --ad-success-mid: #1fa64b;
+    --ad-warning-border-soft: #fde68a;
+    --ad-warning-border: #fecaca;
+    --ad-warning-border-2: #f4b5b5;
+    --ad-info-border-soft: #bae6fd;
+    --ad-participant-border-blue-soft: #bfdbfe;
+    --ad-participant-border-green-soft: #86efac;
+    --ad-participant-border-emerald-soft: #6ee7b7;
+    --ad-participant-icon-sky-soft: #e0f2fe;
+    --ad-participant-icon-emerald-soft: #d1fae5;
+    --ad-danger-border-soft: #ffc9c9;
+    --ad-ui-accent-green: #20e47a;
+    --ad-ui-accent-blue: #2a62d9;
+    --ad-ui-accent-blue-soft: #95bbe8;
+
+     /* ==========================================================
+         Фоны состояния (чипы/алерты/подсказки)
+        ========================================================== */
+
+     --ad-bg-info-soft: #f0f9ff;
+     --ad-bg-primary-soft: #eff6ff;
+     --ad-bg-primary-soft-alt: #f0f7ff;
+     --ad-bg-success-soft: #f0fdf4;
+     --ad-bg-warning-soft: #fffbeb;
+     --ad-bg-danger-soft: #fef2f2;
+    --ad-bg-danger-soft-2: #fff0f0;
+    --ad-bg-muted-soft: #dfe7f3;
+    --ad-bg-page-soft: #f6f8fc;
+    --ad-bg-line-soft: #ccd8e8;
+    --ad-bg-surface-soft: #f2f6fc;
+
+     /* Цветные «пилюли»/бейджи */
+     --ad-badge-blue-bg: #dbeafe;
+     --ad-badge-green-bg: #dcfce7;
+     --ad-badge-purple-bg: #f3e8ff;
+     --ad-badge-yellow-bg: #fef3c7;
+
+     /* ==========================================================
+         Радиусы и тени (единый визуальный ритм скруглений/глубины)
+        ========================================================== */
+
+    --ad-radius-sm: 0.625rem;
+    --ad-radius-md: 0.75rem;
+    --ad-radius-lg: 1rem;
+     --ad-radius-pill: 62.4375rem;
+
+     /* Лёгкая карточная тень (основная для списков/панелей) */
+    --ad-shadow-card: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.1), 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.1);
+
+     /* Усиленная тень для более «поднятых» блоков */
+    --ad-shadow-elevated: 0 0.625rem 0.9375rem rgba(0, 0, 0, 0.1), 0 0.25rem 0.375rem rgba(0, 0, 0, 0.1);
+
+    /* Отдельные rgba-токены для единообразия полупрозрачных эффектов */
+    --ad-alpha-black-10: rgba(0, 0, 0, 0.1);
+    --ad-alpha-black-06: rgba(0, 0, 0, 0.06);
+    --ad-alpha-black-05: rgba(0, 0, 0, 0.05);
+    --ad-alpha-black-25: rgba(0, 0, 0, 0.25);
+    --ad-alpha-white-14: rgba(255, 255, 255, 0.14);
+    --ad-alpha-white-90: rgba(255, 255, 255, 0.9);
+    --ad-alpha-primary-20: rgba(29, 78, 216, 0.2);
+    --ad-alpha-primary-30: rgba(29, 78, 216, 0.3);
+    --ad-alpha-primary-40: rgba(29, 78, 216, 0.4);
+    --ad-alpha-primary-50: rgba(29, 78, 216, 0.5);
+    --ad-alpha-success-13: rgba(34, 197, 94, 0.13);
+    --ad-alpha-success-15: rgba(34, 197, 94, 0.15);
+    --ad-alpha-success-20: rgba(34, 197, 94, 0.2);
+    --ad-alpha-success-25: rgba(34, 197, 94, 0.25);
+    --ad-alpha-success-30: rgba(34, 197, 94, 0.3);
+
+     /* Фокус-кольцо для интерактивных элементов */
+    --ad-focus-ring: 0 0 0 0.1875rem rgba(42, 98, 217, 0.15);
 }

@@ -6,11 +6,13 @@ use App\Models\Bank;
 use App\Models\BankAccount;
 use App\Models\Counterparty;
 use App\Models\CounterpartyType;
+use App\Services\DaData\FindBankService;
 use App\Services\DaData\FindPartyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -136,9 +138,15 @@ class CounterpartyController extends Controller
             ]);
 
             $bankName = trim((string) ($validated['bank_name'] ?? ''));
-            $bik = trim((string) ($validated['bik'] ?? ''));
+            $bik = preg_replace('/\D+/', '', (string) ($validated['bik'] ?? '')) ?? '';
             $bankAccountNumber = trim((string) ($validated['bank_account'] ?? ''));
             $corrAccount = trim((string) ($validated['correspondent_account'] ?? ''));
+
+            if ($bik !== '' && strlen($bik) !== 9) {
+                throw ValidationException::withMessages([
+                    'bik' => 'БИК должен содержать 9 цифр.',
+                ]);
+            }
 
             if ($bankName !== '' || $bik !== '' || $bankAccountNumber !== '' || $corrAccount !== '') {
                 $bank = null;
@@ -148,16 +156,35 @@ class CounterpartyController extends Controller
                 }
 
                 if (! $bank) {
-                    $bank = Bank::query()->firstOrCreate(
-                        [
-                            'name' => $bankName !== '' ? $bankName : 'Банк без названия',
-                            'bik' => $bik !== '' ? $bik : null,
-                        ],
-                        [
-                            'short_name' => null,
-                            'correspondent_account' => $corrAccount !== '' ? $corrAccount : null,
-                        ]
-                    );
+                    try {
+                        if ($bik !== '') {
+                            $bank = Bank::query()->create([
+                                'name' => $bankName !== '' ? $bankName : 'Банк без названия',
+                                'short_name' => null,
+                                'bik' => $bik,
+                                'correspondent_account' => $corrAccount !== '' ? $corrAccount : null,
+                            ]);
+                        } else {
+                            $bank = Bank::query()->firstOrCreate(
+                                [
+                                    'name' => $bankName !== '' ? $bankName : 'Банк без названия',
+                                    'bik' => null,
+                                ],
+                                [
+                                    'short_name' => null,
+                                    'correspondent_account' => $corrAccount !== '' ? $corrAccount : null,
+                                ]
+                            );
+                        }
+                    } catch (QueryException $exception) {
+                        if ($bik !== '' && $this->isDuplicateBikException($exception)) {
+                            $bank = Bank::query()->where('bik', $bik)->first();
+                        }
+
+                        if (! $bank) {
+                            throw $exception;
+                        }
+                    }
                 }
 
                 if ($corrAccount !== '' && $bank->correspondent_account !== $corrAccount) {
@@ -460,6 +487,65 @@ class CounterpartyController extends Controller
         }
     }
 
+    public function autofillBankByBik(Request $request, FindBankService $findBankService): JsonResponse
+    {
+        $validated = $request->validate([
+            'query' => ['required', 'string', 'max:20'],
+        ]);
+
+        $bik = preg_replace('/\D+/', '', (string) $validated['query']) ?? '';
+
+        if (strlen($bik) !== 9) {
+            return response()->json([
+                'message' => 'Укажите корректный БИК (9 цифр).',
+            ], 422);
+        }
+
+        try {
+            $result = $findBankService->findByBik($bik, ['count' => 1]);
+            $suggestion = data_get($result, 'suggestions.0');
+
+            if (! is_array($suggestion)) {
+                return response()->json([
+                    'message' => 'Банк по указанному БИК не найден.',
+                ], 404);
+            }
+
+            $data = is_array($suggestion['data'] ?? null) ? $suggestion['data'] : [];
+
+            $bankName = (string) (
+                data_get($data, 'name.payment')
+                ?? data_get($data, 'name.short')
+                ?? data_get($suggestion, 'value')
+                ?? ''
+            );
+
+            $correspondentAccount = (string) (
+                data_get($data, 'correspondent_account')
+                ?? ''
+            );
+
+            $resolvedBik = (string) (
+                data_get($data, 'bic')
+                ?? data_get($data, 'bik')
+                ?? $bik
+            );
+
+            return response()->json([
+                'message' => 'Реквизиты банка по БИК успешно загружены.',
+                'data' => [
+                    'bank_name' => $bankName !== '' ? $bankName : null,
+                    'bik' => $resolvedBik,
+                    'correspondent_account' => $correspondentAccount !== '' ? $correspondentAccount : null,
+                ],
+            ]);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'message' => 'Не удалось получить реквизиты банка из DaData: '.$exception->getMessage(),
+            ], 422);
+        }
+    }
+
     private function counterpartyRules(): array
     {
         return [
@@ -538,5 +624,17 @@ class CounterpartyController extends Controller
         ]);
 
         return $counterparty;
+    }
+
+    private function isDuplicateBikException(QueryException $exception): bool
+    {
+        $errorInfo = $exception->errorInfo;
+        $sqlState = (string) ($errorInfo[0] ?? '');
+        $driverErrorCode = (string) ($errorInfo[1] ?? '');
+        $driverMessage = mb_strtolower((string) ($errorInfo[2] ?? $exception->getMessage()));
+
+        return ($sqlState === '23000' && $driverErrorCode === '1062')
+            || str_contains($driverMessage, 'duplicate entry')
+            || str_contains($driverMessage, 'banks_bik_unique');
     }
 }

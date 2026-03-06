@@ -29,9 +29,6 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/counterparties', [CounterpartyController::class, 'index'])
         ->middleware('permission:counterparties.view')
         ->name('counterparties.index');
-    Route::get('/counterparties/{counterparty}', [CounterpartyController::class, 'show'])
-        ->middleware('permission:counterparties.view')
-        ->name('counterparties.show');
 
     Route::get('/counterparties/create', [CounterpartyController::class, 'create'])
         ->middleware('permission:counterparties.manage')
@@ -39,6 +36,9 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/counterparties/dadata/autofill', [CounterpartyController::class, 'autofillByInn'])
         ->middleware('permission:counterparties.manage')
         ->name('counterparties.dadata.autofill');
+    Route::post('/counterparties/dadata/bank-autofill', [CounterpartyController::class, 'autofillBankByBik'])
+        ->middleware('permission:counterparties.manage')
+        ->name('counterparties.dadata.bank.autofill');
     Route::post('/counterparties', [CounterpartyController::class, 'store'])
         ->middleware('permission:counterparties.manage')
         ->name('counterparties.store');
@@ -48,6 +48,9 @@ Route::middleware('auth')->group(function (): void {
     Route::put('/counterparties/{counterparty}', [CounterpartyController::class, 'update'])
         ->middleware('permission:counterparties.manage')
         ->name('counterparties.update');
+    Route::get('/counterparties/{counterparty}', [CounterpartyController::class, 'show'])
+        ->middleware('permission:counterparties.view')
+        ->name('counterparties.show');
 
     Route::get('/orders', [OrderController::class, 'index'])
         ->middleware('permission:orders.view')
@@ -69,9 +72,16 @@ Route::middleware('auth')->group(function (): void {
     Route::put('/settings/integrations/dadata', [IntegrationSettingsController::class, 'updateDadata'])
         ->middleware('permission:settings.integrations.manage')
         ->name('settings.dadata.update');
+    Route::put('/settings/integrations/yandex-maps', [IntegrationSettingsController::class, 'updateYandexMaps'])
+        ->middleware('permission:settings.integrations.manage')
+        ->name('settings.yandex_maps.update');
     Route::post('/settings/integrations/dadata/test', [IntegrationSettingsController::class, 'testDadata'])
         ->middleware('permission:settings.integrations.manage')
         ->name('settings.dadata.test');
+
+    Route::view('/settings/icons/sprite-preview', 'settings.icons-preview', ['activeMenu' => 'settings'])
+        ->middleware('permission:settings.integrations.manage')
+        ->name('settings.icons.preview');
 
     Route::get('/driver/panel', function () {
         return view('driver.panel');

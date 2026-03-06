@@ -1,0 +1,7 @@
+.ad-h1 {
+    margin: var(--ad-h1-margin);
+    color: var(--ad-h1-color);
+    font-size: var(--ad-h1-font-size);
+    line-height: var(--ad-h1-line-height);
+    font-weight: var(--ad-h1-font-weight);
+}

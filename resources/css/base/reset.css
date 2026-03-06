@@ -63,7 +63,6 @@ body,
 
 /* Параграфы без class получают аккуратный ритм */
 p {
-    --paragraph-margin-bottom: 1.5rem;
     margin-block: 0;
 }
 

@@ -1,7 +1,17 @@
+/*
+ █████╗ ██╗  ██╗███████╗ ██████╗ ██████╗ ██████╗ ███████╗████████╗███████╗ ██████╗██╗  ██╗
+██╔══██╗╚██╗██╔╝██╔════╝██╔════╝██╔═══██╗██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔════╝██║  ██║
+███████║ ╚███╔╝ █████╗  ██║     ██║   ██║██║  ██║█████╗     ██║   █████╗  ██║     ███████║
+██╔══██║ ██╔██╗ ██╔══╝  ██║     ██║   ██║██║  ██║██╔══╝     ██║   ██╔══╝  ██║     ██╔══██║
+██║  ██║██╔╝ ██╗███████╗╚██████╗╚██████╔╝██████╔╝███████╗██╗██║   ███████╗╚██████╗██║  ██║
+╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝╚═╝╚═╝   ╚══════╝ ╚═════╝╚═╝  ╚═╝
+*/
 /* Base layers */
 @import './base/fonts.css';
 @import './base/root.css';
 @import './base/reset.css';
+@import './base/typography.css';
+@import './base/buttons.css';
 
 /* Template styles */
 @import './templates/layout.css';
@@ -13,3 +23,4 @@
 @import './templates/counterparties-show.css';
 @import './templates/driver.css';
 @import './templates/settings.css';
+@import './templates/icons-preview.css';

@@ -9,13 +9,11 @@
 @section('content')
     <div class="cp-page">
         <div class="cp-page__top">
-            <h1 class="cp-page__title">Контрагенты</h1>
+            <h1 class="ad-h1">Контрагенты</h1>
 
-            <a class="cp-btn cp-btn--success" href="{{ route('counterparties.create') }}">
-                <span class="cp-btn__icon" aria-hidden="true">
-                    <svg viewBox="0 0 20 20" focusable="false">
-                        <path d="M10 4.17a.83.83 0 0 1 .83.83v4.17H15a.83.83 0 1 1 0 1.66h-4.17V15a.83.83 0 1 1-1.66 0v-4.17H5a.83.83 0 1 1 0-1.66h4.17V5c0-.46.37-.83.83-.83Z" fill="currentColor"/>
-                    </svg>
+            <a class="ad-btn" href="{{ route('counterparties.create') }}">
+                <span aria-hidden="true">
+                    <svg viewBox="0 0 16 16" focusable="false"><use href="/icons/sprite.svg#icon-doc-plus"></use></svg>
                 </span>
                 <span>Новый контрагент</span>
             </a>
@@ -28,9 +26,7 @@
         <form class="cp-filters" action="{{ route('counterparties.index') }}" method="get" role="search" aria-label="Фильтры контрагентов">
             <label class="cp-input cp-input--search" for="counterparties-search">
                 <span class="cp-input__icon" aria-hidden="true">
-                    <svg viewBox="0 0 20 20" focusable="false">
-                        <path d="M9 3a6 6 0 1 1 0 12 6 6 0 0 1 0-12Zm0 1.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Zm5.56 9.99 2.97 2.97a.75.75 0 0 1-1.06 1.06l-2.97-2.97a.75.75 0 1 1 1.06-1.06Z" fill="currentColor"/>
-                    </svg>
+                    <svg viewBox="0 0 20 20" focusable="false"><use href="/icons/sprite.svg#icon-search"></use></svg>
                 </span>
                 <input id="counterparties-search" type="search" name="search" value="{{ $search }}" placeholder="Поиск по названию, ИНН, телефону...">
             </label>
@@ -45,9 +41,9 @@
             </label>
 
             <div class="cp-filters__actions">
-                <button class="cp-btn cp-btn--filter" type="submit">Применить</button>
+                <button class="ad-btn" type="submit">Применить</button>
                 @if ($search !== '' || $selectedType !== '')
-                    <a class="cp-btn cp-btn--ghost" href="{{ route('counterparties.index') }}">Сбросить</a>
+                    <a class="ad-btn" href="{{ route('counterparties.index') }}">Сбросить</a>
                 @endif
             </div>
         </form>
@@ -88,10 +84,7 @@
                                 <div class="cp-entity">
                                     <span class="cp-entity__icon {{ $isPersonType ? 'is-person' : 'is-legal' }}" aria-hidden="true">
                                         @if ($isPersonType)
-                                            <svg viewBox="0 0 20 20" focusable="false">
-                                                <circle cx="10" cy="6.7" r="2.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
-                                                <path d="M5.8 15.2c0-2.2 1.9-3.8 4.2-3.8s4.2 1.6 4.2 3.8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                                            </svg>
+                                            <svg viewBox="0 0 20 20" focusable="false"><use href="/icons/sprite.svg#icon-doc-man"></use></svg>
                                         @else
                                             <svg viewBox="0 0 20 20" focusable="false">
                                                 <use href="/icons/sprite.svg#icon-counterparties"></use>
@@ -110,21 +103,18 @@
                             <td>
                                 <p class="cp-city">
                                     <span class="cp-inline-icon" aria-hidden="true">
-                                        <svg viewBox="0 0 16 16" focusable="false">
-                                            <path d="M8 14s4-3.73 4-7a4 4 0 1 0-8 0c0 3.27 4 7 4 7Z" fill="none" stroke="currentColor" stroke-width="1.4"/>
-                                            <circle cx="8" cy="7" r="1.6" fill="none" stroke="currentColor" stroke-width="1.4"/>
-                                        </svg>
+                                        <svg viewBox="0 0 20 20" focusable="false"><use href="/icons/sprite.svg#icon-doc-place"></use></svg>
                                     </span>
                                     <span>{{ $cityText }}</span>
                                 </p>
                             </td>
                             <td>
                                 <p class="cp-contact">
-                                    <span class="cp-inline-icon" aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false"><path d="M5.6 2.67h1.2c.27 0 .5.18.57.44l.46 1.85a.58.58 0 0 1-.16.57L6.66 6.54a9.36 9.36 0 0 0 2.8 2.8l1.02-1.01a.58.58 0 0 1 .57-.16l1.84.46c.27.07.45.3.45.57v1.2a1 1 0 0 1-1 1A8.67 8.67 0 0 1 3.67 4.67a1 1 0 0 1 1-2Z" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg></span>
+                                    <span class="cp-inline-icon" aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg></span>
                                     <span>{{ $counterparty->phone ?: '—' }}</span>
                                 </p>
                                 @if (! empty($counterparty->email))
-                                    <p class="cp-contact"><span class="cp-inline-icon" aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false"><rect x="2.5" y="3.5" width="11" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="m3.5 5 4.5 3.5L12.5 5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>{{ $counterparty->email }}</span></p>
+                                    <p class="cp-contact"><span class="cp-inline-icon" aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false"><use href="/icons/sprite.svg#icon-auth-mail"></use></svg></span><span>{{ $counterparty->email }}</span></p>
                                 @endif
                             </td>
                             <td class="cp-date">{{ optional($counterparty->created_at)->format('d.m.Y') }}</td>

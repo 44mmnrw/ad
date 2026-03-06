@@ -1,0 +1,98 @@
+ .icons-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.icons-preview__head p {
+    margin: 0.375rem 0 0;
+    color: var(--ad-slate-500);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.icons-preview__toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.icons-preview__search {
+    min-height: 2.625rem;
+    min-width: 18rem;
+    border: 1px solid var(--ad-slate-300);
+    border-radius: var(--ad-radius-md);
+    background: var(--ad-white);
+    color: var(--ad-slate-900);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    padding: 0.625rem 0.75rem;
+}
+
+.icons-preview__meta {
+    color: var(--ad-slate-500);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.icons-preview__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: 0.75rem;
+}
+
+.icons-preview__card {
+    border: 1px solid var(--ad-slate-300);
+    border-radius: var(--ad-radius-md);
+    background: var(--ad-white);
+    box-shadow: var(--ad-shadow-card);
+    padding: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.icons-preview__glyph {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    border: 1px solid var(--ad-slate-200);
+    background: var(--ad-slate-050);
+    color: var(--ad-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icons-preview__glyph svg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.icons-preview__title {
+    margin: 0;
+    color: var(--ad-slate-900);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 600;
+}
+
+.icons-preview__id {
+    margin: 0;
+    color: var(--ad-slate-500);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-family: Consolas, 'Courier New', monospace;
+}
+
+.icons-preview__group {
+    width: fit-content;
+    min-height: 1.25rem;
+    border-radius: var(--ad-radius-pill);
+    background: var(--ad-slate-100);
+    color: var(--ad-slate-600);
+    padding: 0.125rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+}

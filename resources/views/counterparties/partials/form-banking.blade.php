@@ -14,10 +14,7 @@
 
     <section class="cp-bank-edit__header" aria-label="Банковские реквизиты">
         <span class="cp-bank-edit__icon" aria-hidden="true">
-            <svg viewBox="0 0 20 20" focusable="false">
-                <path d="M10 2.5 3 6h14L10 2.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                <path d="M4.5 7.2h11M5.5 8.5v6M8.5 8.5v6M11.5 8.5v6M14.5 8.5v6M4 15.8h12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
+            <svg viewBox="0 0 20 20" focusable="false"><use href="/icons/sprite.svg#icon-doc-landmark"></use></svg>
         </span>
         <div>
             <h3>Банковские реквизиты</h3>
@@ -34,7 +31,12 @@
         <div class="cp-inline-form__grid">
             <label class="cp-inline-form__field">
                 <span>БИК</span>
-                <input type="text" name="bik" value="{{ old('bik', $bankBik) }}" placeholder="044525225">
+                <div class="cp-inline-form__input-with-action">
+                    <input type="text" name="bik" value="{{ old('bik', $bankBik) }}" placeholder="044525225" data-dadata-bank-query-input>
+                    <button type="button" class="ad-btn" data-dadata-bank-fill-btn>DaData</button>
+                </div>
+                <small class="cp-inline-form__hint">Введите БИК и нажмите DaData (или просто выйдите из поля).</small>
+                <p class="cp-dadata-fill__status" data-dadata-bank-fill-status hidden></p>
             </label>
             <label class="cp-inline-form__field" data-type-visible-kinds="legal">
                 <span>КПП</span>
@@ -54,9 +56,136 @@
     </div>
 
     <div class="cp-bank-edit__notice">
-        <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
-            <path d="M16.7 5.3a1 1 0 0 1 0 1.4l-7.2 7.2a1 1 0 0 1-1.4 0L4.8 10.6a1 1 0 1 1 1.4-1.4l2.6 2.6 6.5-6.5a1 1 0 0 1 1.4 0Z" fill="currentColor"/>
-        </svg>
+        <svg viewBox="0 0 12 12" focusable="false" aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-checkcheck"></use></svg>
         <span>Реквизиты заполнены и будут сохранены</span>
     </div>
 </form>
+
+<script>
+    (() => {
+        const form = document.getElementById('cp-counterparty-form');
+        if (!form) {
+            return;
+        }
+
+        const fillButton = form.querySelector('[data-dadata-bank-fill-btn]');
+        const statusNode = form.querySelector('[data-dadata-bank-fill-status]');
+        const queryInput = form.querySelector('[data-dadata-bank-query-input]') || form.querySelector('input[name="bik"]');
+        const endpoint = '{{ route('counterparties.dadata.bank.autofill') }}';
+        let isLoading = false;
+        let lastLoadedBik = '';
+
+        if (!fillButton || !queryInput) {
+            return;
+        }
+
+        const showStatus = (message, state = 'info') => {
+            if (!statusNode) {
+                return;
+            }
+
+            statusNode.hidden = false;
+            statusNode.classList.remove('is-success', 'is-error');
+
+            if (state === 'success') {
+                statusNode.classList.add('is-success');
+            }
+
+            if (state === 'error') {
+                statusNode.classList.add('is-error');
+            }
+
+            statusNode.textContent = message;
+        };
+
+        const setFieldValue = (name, value) => {
+            const input = form.querySelector(`[name="${name}"]`);
+            if (!input || value === null || value === undefined || value === '') {
+                return;
+            }
+
+            input.value = value;
+        };
+
+        const loadBankByBik = async ({ silentInvalid = false } = {}) => {
+            const rawBik = String(queryInput.value || '').trim();
+            const normalizedBik = rawBik.replace(/\D+/g, '');
+
+            if (normalizedBik.length !== 9) {
+                if (!silentInvalid) {
+                    showStatus('Введите корректный БИК (9 цифр).', 'error');
+                    queryInput.focus();
+                }
+                return;
+            }
+
+            if (isLoading || normalizedBik === lastLoadedBik) {
+                return;
+            }
+
+            const token = form.querySelector('input[name="_token"]')?.value || '';
+            const payload = new URLSearchParams();
+            payload.append('_token', token);
+            payload.append('query', normalizedBik);
+
+            isLoading = true;
+            fillButton.disabled = true;
+            showStatus('Загружаем реквизиты банка из DaData...');
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: payload.toString(),
+                });
+
+                const json = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(json?.message || 'Не удалось получить реквизиты банка из DaData.');
+                }
+
+                const data = json?.data || {};
+
+                setFieldValue('bank_name', data.bank_name);
+                setFieldValue('bik', data.bik);
+                setFieldValue('correspondent_account', data.correspondent_account);
+
+                lastLoadedBik = normalizedBik;
+                showStatus(json?.message || 'Реквизиты банка успешно заполнены.', 'success');
+            } catch (error) {
+                showStatus(error?.message || 'Не удалось получить реквизиты банка из DaData.', 'error');
+            } finally {
+                isLoading = false;
+                fillButton.disabled = false;
+            }
+        };
+
+        fillButton.addEventListener('click', () => {
+            loadBankByBik({ silentInvalid: false });
+        });
+
+        queryInput.addEventListener('blur', () => {
+            loadBankByBik({ silentInvalid: true });
+        });
+
+        queryInput.addEventListener('keydown', (event) => {
+            if (event.key !== 'Enter') {
+                return;
+            }
+
+            event.preventDefault();
+            loadBankByBik({ silentInvalid: false });
+        });
+
+        queryInput.addEventListener('paste', () => {
+            window.setTimeout(() => {
+                loadBankByBik({ silentInvalid: true });
+            }, 0);
+        });
+    })();
+</script>

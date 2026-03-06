@@ -5,8 +5,13 @@
 @section('content')
     <div class="settings-page">
         <header class="settings-page__head">
-            <h1>Интеграция DaData</h1>
+            <h1 class="ad-h1">Интеграция DaData</h1>
             <p>API find-party: поиск организации или ИП по ИНН/ОГРН.</p>
+            <div class="settings-page__actions">
+                <a class="ad-btn" href="{{ route('settings.icons.preview') }}">
+                    Открыть превью иконок спрайта
+                </a>
+            </div>
         </header>
 
         @if (session('status'))
@@ -25,9 +30,12 @@
         @endif
 
         @if (session('dadata_test_result'))
-            <div class="settings-page__hint" role="status">
+            <div class="settings-page__hint settings-page__hint--stack" role="status">
                 <strong>Результат теста:</strong>
                 <span>{{ session('dadata_test_result') }}</span>
+                @if (session('dadata_test_payload'))
+                    <pre class="settings-page__json">{{ session('dadata_test_payload') }}</pre>
+                @endif
             </div>
         @endif
 
@@ -52,7 +60,23 @@
                 </label>
 
                 <div class="settings-form__actions">
-                    <button type="submit" class="cp-btn cp-btn--success">Сохранить</button>
+                    <button type="submit" class="ad-btn">Сохранить</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="settings-card" aria-label="Параметры API Яндекс Карт">
+            <form action="{{ route('settings.yandex_maps.update') }}" method="post" class="settings-form">
+                @csrf
+                @method('PUT')
+
+                <label class="settings-form__field">
+                    <span>API key Яндекс Карт</span>
+                    <input type="text" name="yandex_static_api_key" value="{{ old('yandex_static_api_key', $yandexStaticApiKey) }}" placeholder="Введите API-ключ Static Maps API (опционально)">
+                </label>
+
+                <div class="settings-form__actions">
+                    <button type="submit" class="ad-btn">Сохранить</button>
                 </div>
             </form>
         </section>
@@ -61,11 +85,11 @@
             <form action="{{ route('settings.dadata.test') }}" method="post" class="settings-form settings-form--inline">
                 @csrf
                 <label class="settings-form__field settings-form__field--grow">
-                    <span>Тестовый ИНН/ОГРН</span>
+                    <span>Тестовый ИНН</span>
                     <input type="text" name="test_query" value="{{ old('test_query') }}" placeholder="Например: 7707083893" required>
                 </label>
                 <div class="settings-form__actions">
-                    <button type="submit" class="cp-btn cp-btn--ghost">Проверить подключение</button>
+                    <button type="submit" class="ad-btn">Проверить подключение</button>
                 </div>
             </form>
         </section>

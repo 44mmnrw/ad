@@ -1,0 +1,43 @@
+.ad-btn {
+    --ad-btn-min-height: 2.625rem;
+    --ad-btn-py: 0.625rem;
+    --ad-btn-px: 0.875rem;
+    --ad-btn-radius: 0.75rem;
+    --ad-btn-font-size: 0.875rem;
+    --ad-btn-line-height: 1.25rem;
+    --ad-btn-font-weight: 500;
+
+    min-height: var(--ad-btn-min-height);
+    padding: var(--ad-btn-py) var(--ad-btn-px);
+    border-radius: var(--ad-btn-radius);
+    border: 0.0625rem solid transparent;
+    background: var(--ad-primary-600);
+    color: var(--ad-white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    font-size: var(--ad-btn-font-size);
+    line-height: var(--ad-btn-line-height);
+    font-weight: var(--ad-btn-font-weight);
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ad-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--ad-focus-ring);
+}
+
+.ad-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.ad-btn svg {
+    width: 1rem;
+    height: 1rem;
+}
+
+

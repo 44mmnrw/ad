@@ -46,7 +46,7 @@
 
     <div class="cp-contacts-edit__head">
         <p>{{ count($contactRows) }} контакта</p>
-        <button id="cp-add-contact" type="button" class="cp-contacts-edit__add">+ Добавить</button>
+        <button id="cp-add-contact" type="button" class="ad-btn">+ Добавить</button>
     </div>
 
     <div id="cp-contacts-list" class="cp-contacts-edit__list">
@@ -64,7 +64,7 @@
                             <input type="radio" name="primary_contact_index" value="{{ $index }}" {{ (int) $primaryIndex === (int) $index ? 'checked' : '' }}>
                             <span>☆</span>
                         </label>
-                        <button type="button" class="cp-contacts-edit__remove" data-remove-contact title="Удалить">×</button>
+                        <button type="button" class="ad-btn" data-remove-contact title="Удалить">×</button>
                     </div>
                 </div>
 
@@ -104,7 +104,7 @@
                         <input type="radio" name="primary_contact_index" value="__INDEX__">
                         <span>☆</span>
                     </label>
-                    <button type="button" class="cp-contacts-edit__remove" data-remove-contact title="Удалить">×</button>
+                    <button type="button" class="ad-btn" data-remove-contact title="Удалить">×</button>
                 </div>
             </div>
 

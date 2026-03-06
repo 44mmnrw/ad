@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\IntegrationSetting;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -93,6 +94,7 @@ class OrderController extends Controller
                 'status' => 'В пути',
                 'status_code' => 'in_transit',
                 'distance' => '480 км',
+                'cost' => 68500,
                 'route' => [
                     'from' => ['city' => 'Москва', 'address' => 'ул. Ленина, 12', 'lat' => 55.7558, 'lng' => 37.6176],
                     'to' => ['city' => 'Санкт-Петербург', 'address' => 'пр. Невский, 45', 'lat' => 59.9343, 'lng' => 30.3351],
@@ -131,6 +133,7 @@ class OrderController extends Controller
                 'status' => 'Загрузка',
                 'status_code' => 'loading',
                 'distance' => '820 км',
+                'cost' => 94300,
                 'route' => [
                     'from' => ['city' => 'Казань', 'address' => 'ул. Баумана, 10', 'lat' => 55.7961, 'lng' => 49.1064],
                     'to' => ['city' => 'Москва', 'address' => 'Ленинградский проспект, 37', 'lat' => 55.7905, 'lng' => 37.5448],
@@ -169,6 +172,7 @@ class OrderController extends Controller
                 'status' => 'Завершено',
                 'status_code' => 'completed',
                 'distance' => '1420 км',
+                'cost' => 157900,
                 'route' => [
                     'from' => ['city' => 'Новосибирск', 'address' => 'ул. Фрунзе, 5', 'lat' => 55.0084, 'lng' => 82.9357],
                     'to' => ['city' => 'Екатеринбург', 'address' => 'ул. Малышева, 88', 'lat' => 56.8389, 'lng' => 60.6057],
@@ -207,6 +211,7 @@ class OrderController extends Controller
                 'status' => 'Разгрузка',
                 'status_code' => 'unloading',
                 'distance' => '285 км',
+                'cost' => 41200,
                 'route' => [
                     'from' => ['city' => 'Краснодар', 'address' => 'ул. Северная, 201', 'lat' => 45.0355, 'lng' => 38.9753],
                     'to' => ['city' => 'Ростов-на-Дону', 'address' => 'Будённовский пр., 98', 'lat' => 47.2357, 'lng' => 39.7015],
@@ -272,6 +277,16 @@ class OrderController extends Controller
             'pt' => $fromPoint.',pm2blm~'.$toPoint.',pm2grm',
             'pl' => 'c:1d4ed8A0,w:4,'.$fromPoint.','.$toPoint,
         ];
+
+        $yandexStaticApiKey = (string) IntegrationSetting::getValue(
+            'yandex_maps',
+            'static_api_key',
+            config('services.yandex_maps.static_api_key')
+        );
+
+        if ($yandexStaticApiKey !== '') {
+            $params['apikey'] = $yandexStaticApiKey;
+        }
 
         return 'https://static-maps.yandex.ru/1.x/?'.http_build_query($params, '', '&', PHP_QUERY_RFC3986);
     }

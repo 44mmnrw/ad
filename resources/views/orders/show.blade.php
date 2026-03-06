@@ -10,7 +10,10 @@
     <div class="order-show">
         <div class="order-show__top">
             <a class="orders-back" href="{{ route('orders.index') }}">← Вернуться к списку</a>
-            <a class="orders-btn orders-btn--outline" href="{{ route('orders.edit', $order['id']) }}">✎ Редактировать</a>
+            <a class="ad-btn" href="{{ route('orders.edit', $order['id']) }}">
+                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-edit"></use></svg>
+                <span>Редактировать</span>
+            </a>
         </div>
 
         <div class="order-show__grid">
@@ -64,6 +67,43 @@
                     </div>
                 </section>
 
+                <section class="order-card order-card--cost" aria-label="Стоимость перевозки">
+                    @php
+                        $costWithVat = (int) ($order['cost'] ?? 0);
+                        $vatRate = 20;
+                        $costWithoutVat = (int) round($costWithVat / (1 + ($vatRate / 100)));
+                        $vatAmount = max($costWithVat - $costWithoutVat, 0);
+                    @endphp
+
+                    <div class="order-cost-card__body">
+                        <div class="order-cost-card__title-row">
+                            <span class="order-cost-card__icon" aria-hidden="true">
+                                <svg><use href="/icons/sprite.svg#icon-rubl"></use></svg>
+                            </span>
+                            <h2 class="order-cost-card__title">Стоимость перевозки</h2>
+                        </div>
+
+                        <div class="order-cost">
+                            <div class="order-cost__item">
+                                <p class="order-cost__label">Без НДС</p>
+                                <p class="order-cost__value">{{ number_format($costWithoutVat, 0, ',', ' ') }} ₽</p>
+                            </div>
+                            <div class="order-cost__item">
+                                <p class="order-cost__label">Ставка НДС</p>
+                                <p class="order-cost__value">{{ $vatRate }}%</p>
+                            </div>
+                            <div class="order-cost__item">
+                                <p class="order-cost__label">Сумма НДС</p>
+                                <p class="order-cost__value order-cost__value--muted">{{ number_format($vatAmount, 0, ',', ' ') }} ₽</p>
+                            </div>
+                            <div class="order-cost__item">
+                                <p class="order-cost__label">Итого с НДС</p>
+                                <p class="order-cost__value order-cost__value--total">{{ number_format($costWithVat, 0, ',', ' ') }} ₽</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section class="order-card">
                     <h2>Прогресс доставки</h2>
                     <div class="progress-line">
@@ -85,46 +125,92 @@
                         <p class="driver-link-box__hint">{{ $order['driver_link_expires'] }}</p>
                     </div>
                     <div class="order-actions">
-                        <button class="orders-btn orders-btn--outline" type="button">📋 Копировать ссылку</button>
-                        <button class="orders-btn orders-btn--success" type="button">📱 Отправить SMS</button>
+                        <button class="ad-btn" type="button">📋 Копировать ссылку</button>
+                        <button class="ad-btn" type="button">📱 Отправить SMS</button>
                     </div>
                 </section>
             </div>
 
             <aside class="order-show__right" aria-label="Участники перевозки">
-                <section class="person-card person-card--blue">
-                    <h3>{{ $order['driver']['emoji'] }} {{ $order['driver']['title'] }}</h3>
+                <section class="person-card person-card--carrier">
+                    <div class="person-card__head">
+                        <span class="person-card__icon-wrap" aria-hidden="true">
+                            <svg><use href="/icons/sprite.svg#icon-truck"></use></svg>
+                        </span>
+                        <h3>Грузоперевозчик</h3>
+                    </div>
+                    <p class="person-card__label">Название</p>
+                    <p class="person-card__value">ООО "ТрансЛогистик"</p>
+                    <p class="person-card__label">Телефон</p>
+                    <p class="person-card__value">+7 (495) 100-20-30</p>
+                    <div class="person-card__actions">
+                        <button class="ad-btn" type="button">
+                            <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg>
+                            <span>Позвонить</span>
+                        </button>
+                    </div>
+                </section>
+
+                <section class="person-card person-card--driver">
+                    <div class="person-card__head">
+                        <span class="person-card__icon-wrap" aria-hidden="true">
+                            <svg><use href="/icons/sprite.svg#icon-doc-man"></use></svg>
+                        </span>
+                        <h3>Водитель</h3>
+                    </div>
                     <p class="person-card__label">ФИО</p>
                     <p class="person-card__value">{{ $order['driver']['name'] }}</p>
-                    <p class="person-card__label">Авто</p>
+                    <p class="person-card__label">Транспорт</p>
                     <p class="person-card__value">{{ $order['driver']['car'] }}</p>
                     <p class="person-card__label">Телефон</p>
                     <p class="person-card__value">{{ $order['driver']['phone'] }}</p>
                     <div class="person-card__actions person-card__actions--two">
-                        <button class="orders-btn orders-btn--primary" type="button">📞 Позвонить</button>
-                        <button class="orders-btn orders-btn--success" type="button">💬 WhatsApp</button>
+                        <button class="ad-btn" type="button">
+                            <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg>
+                            <span>Позвонить</span>
+                        </button>
+                        <button class="ad-btn" type="button">
+                            <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-message"></use></svg>
+                            <span>WhatsApp</span>
+                        </button>
                     </div>
                 </section>
 
-                <section class="person-card person-card--green">
-                    <h3>{{ $order['sender']['emoji'] }} {{ $order['sender']['title'] }}</h3>
-                    <p class="person-card__label">ФИО</p>
+                <section class="person-card person-card--sender">
+                    <div class="person-card__head">
+                        <span class="person-card__icon-wrap" aria-hidden="true">
+                            <svg><use href="/icons/sprite.svg#icon-doc-package"></use></svg>
+                        </span>
+                        <h3>Грузоотправитель</h3>
+                    </div>
+                    <p class="person-card__label">ФИО / Организация</p>
                     <p class="person-card__value">{{ $order['sender']['name'] }}</p>
                     <p class="person-card__label">Телефон</p>
                     <p class="person-card__value">{{ $order['sender']['phone'] }}</p>
                     <div class="person-card__actions">
-                        <button class="orders-btn orders-btn--success" type="button">📞 Позвонить</button>
+                        <button class="ad-btn" type="button">
+                            <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg>
+                            <span>Позвонить</span>
+                        </button>
                     </div>
                 </section>
 
-                <section class="person-card person-card--blue">
-                    <h3>{{ $order['receiver']['emoji'] }} {{ $order['receiver']['title'] }}</h3>
-                    <p class="person-card__label">ФИО</p>
+                <section class="person-card person-card--receiver">
+                    <div class="person-card__head">
+                        <span class="person-card__icon-wrap" aria-hidden="true">
+                            <svg><use href="/icons/sprite.svg#icon-doc-packagecheck"></use></svg>
+                        </span>
+                        <h3>Грузополучатель</h3>
+                    </div>
+                    <p class="person-card__label">ФИО / Организация</p>
                     <p class="person-card__value">{{ $order['receiver']['name'] }}</p>
                     <p class="person-card__label">Телефон</p>
                     <p class="person-card__value">{{ $order['receiver']['phone'] }}</p>
                     <div class="person-card__actions">
-                        <button class="orders-btn orders-btn--primary" type="button">📞 Позвонить</button>
+                        <button class="ad-btn" type="button">
+                            <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg>
+                            <span>Позвонить</span>
+                        </button>
                     </div>
                 </section>
             </aside>

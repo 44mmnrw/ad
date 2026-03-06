@@ -47,7 +47,7 @@
         <a class="ad-sidebar__link {{ ($activeMenu ?? null) === 'driver-panel' ? 'is-active' : '' }}" href="{{ route('driver.panel') }}" target="_blank">
             <span class="ad-sidebar__icon" aria-hidden="true">
                 <svg viewBox="0 0 20 20" focusable="false">
-                    <use href="/icons/sprite.svg#icon-drivers"></use>
+                    <use href="/icons/sprite.svg#icon-stat-drivers"></use>
                 </svg>
             </span>
             <span>Панель водителя</span>

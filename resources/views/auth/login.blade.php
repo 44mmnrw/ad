@@ -17,7 +17,7 @@
 
             <header class="ad-auth-hero__brand">
                 <div class="ad-auth-hero__logo" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" focusable="false"><use href="/icons/sprite.svg#icon-auth-truck"></use></svg>
+                    <svg viewBox="0 0 24 24" focusable="false"><use href="/icons/sprite.svg#icon-truck"></use></svg>
                 </div>
                 <div>
                     <p class="ad-auth-hero__brand-title">Авто Доставка</p>
@@ -48,7 +48,7 @@
         <section class="ad-auth-panel" aria-label="Форма входа">
             <div class="ad-auth-panel__inner">
                 <div class="ad-auth-panel__head">
-                    <h1 id="login-title" class="ad-auth-title">Добро пожаловать</h1>
+                    <h1 id="login-title" class="ad-h1">Добро пожаловать</h1>
                     <p class="ad-auth-subtitle">Введите данные для входа в систему</p>
                 </div>
 
@@ -106,9 +106,9 @@
                             <span>Запомнить меня на этом устройстве</span>
                         </label>
 
-                        <button class="ad-auth-submit" type="submit">
+                        <button class="ad-btn" type="submit">
                             <span>Войти в систему</span>
-                            <span class="ad-auth-submit__icon" aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false"><use href="/icons/sprite.svg#icon-auth-arrow-right"></use></svg></span>
+                            <span aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false"><use href="/icons/sprite.svg#icon-auth-arrow-right"></use></svg></span>
                         </button>
                     </form>
                 </section>

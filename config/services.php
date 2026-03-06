@@ -44,6 +44,7 @@ return [
         'secret_key' => env('DADATA_SECRET_KEY'),
         'timeout' => (int) env('DADATA_TIMEOUT', 10),
         'find_party_url' => env('DADATA_FIND_PARTY_URL', 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party'),
+        'find_bank_url' => env('DADATA_FIND_BANK_URL', 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/bank'),
     ],
 
 ];

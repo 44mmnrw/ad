@@ -10,9 +10,14 @@
         $initials = $initials !== '' ? $initials : 'П';
     @endphp
 
-    <div class="ad-topbar__brand">        
+    <a class="ad-topbar__brand" href="{{ route('dashboard') }}" aria-label="Вернуться на дашборд">
+        <span class="ad-topbar__brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+                <use href="/icons/sprite.svg#icon-truck"></use>
+            </svg>
+        </span>
         <span>Авто Доставка</span>
-    </div>
+    </a>
 
     <nav class="ad-topbar__nav" aria-label="Основная навигация">
         @can('orders.view')
@@ -31,11 +36,9 @@
         <span>{{ $displayName }}</span>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button class="ad-icon-btn" type="submit" aria-label="Выйти">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 7l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M19 12H9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M12 20H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <button class="ad-btn" type="submit" aria-label="Выйти">
+                <svg width="16" height="16" viewBox="0 0 16 16" focusable="false" aria-hidden="true">
+                    <use href="/icons/sprite.svg#icon-doc-logout"></use>
                 </svg>
             </button>
         </form>

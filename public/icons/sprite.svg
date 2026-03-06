@@ -1,51 +1,58 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
-  <symbol id="icon-dashboard" viewBox="0 0 20 20" fill="none">
+  <!-- Навигация: Дашборд -->
+  <symbol id="icon-dashboard" viewBox="0 0 20 20" fill="none" data-label="Дашборд" data-group="Навигация">
     <path d="M4 2.5h8l4 4v11A1.5 1.5 0 0 1 14.5 19h-10A1.5 1.5 0 0 1 3 17.5v-13A2 2 0 0 1 5 2.5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
     <path d="M12 2.5V7h4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
     <path d="M6.5 10.5h6M6.5 13.5h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
   </symbol>
 
-  <symbol id="icon-orders" viewBox="0 0 20 20" fill="none">
+  <!-- Навигация: Заявки -->
+  <symbol id="icon-orders" viewBox="0 0 20 20" fill="none" data-label="Заявки" data-group="Навигация">
     <rect x="3" y="2.5" width="14" height="15" rx="2" stroke="currentColor" stroke-width="1.7"/>
     <path d="M6.5 6.5h7M6.5 10h7M6.5 13.5h4.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
   </symbol>
 
-  <symbol id="icon-counterparties" viewBox="0 0 20 20" fill="none">
+  <!-- Навигация: Контрагенты -->
+  <symbol id="icon-counterparties" viewBox="0 0 20 20" fill="none" data-label="Контрагенты" data-group="Навигация">
     <g clip-path="url(#clip0_32_79)">
-      <path d="M5 18.3333V3.33332C5 2.8913 5.17559 2.46737 5.48816 2.15481C5.80072 1.84225 6.22464 1.66666 6.66667 1.66666H13.3333C13.7754 1.66666 14.1993 1.84225 14.5118 2.15481C14.8244 2.46737 15 2.8913 15 3.33332V18.3333H5Z" stroke="#22C55E" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M5.00002 10H3.33335C2.89133 10 2.4674 10.1756 2.15484 10.4882C1.84228 10.8007 1.66669 11.2246 1.66669 11.6667V16.6667C1.66669 17.1087 1.84228 17.5326 2.15484 17.8452C2.4674 18.1577 2.89133 18.3333 3.33335 18.3333H5.00002" stroke="#22C55E" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M15 7.5H16.6667C17.1087 7.5 17.5326 7.6756 17.8452 7.98816C18.1577 8.30072 18.3333 8.72464 18.3333 9.16667V16.6667C18.3333 17.1087 18.1577 17.5326 17.8452 17.8452C17.5326 18.1577 17.1087 18.3333 16.6667 18.3333H15" stroke="#22C55E" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M8.33331 5H11.6666" stroke="#22C55E" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M8.33331 8.33334H11.6666" stroke="#22C55E" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M8.33331 11.6667H11.6666" stroke="#22C55E" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M8.33331 15H11.6666" stroke="#22C55E" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M5 18.3333V3.33332C5 2.8913 5.17559 2.46737 5.48816 2.15481C5.80072 1.84225 6.22464 1.66666 6.66667 1.66666H13.3333C13.7754 1.66666 14.1993 1.84225 14.5118 2.15481C14.8244 2.46737 15 2.8913 15 3.33332V18.3333H5Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M5.00002 10H3.33335C2.89133 10 2.4674 10.1756 2.15484 10.4882C1.84228 10.8007 1.66669 11.2246 1.66669 11.6667V16.6667C1.66669 17.1087 1.84228 17.5326 2.15484 17.8452C2.4674 18.1577 2.89133 18.3333 3.33335 18.3333H5.00002" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M15 7.5H16.6667C17.1087 7.5 17.5326 7.6756 17.8452 7.98816C18.1577 8.30072 18.3333 8.72464 18.3333 9.16667V16.6667C18.3333 17.1087 18.1577 17.5326 17.8452 17.8452C17.5326 18.1577 17.1087 18.3333 16.6667 18.3333H15" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8.33331 5H11.6666" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8.33331 8.33334H11.6666" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8.33331 11.6667H11.6666" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8.33331 15H11.6666" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
     </g>
     <defs>
       <clipPath id="clip0_32_79">
-        <rect width="20" height="20" fill="white"/>
+        <rect width="20" height="20" fill="currentColor"/>
       </clipPath>
     </defs>
   </symbol>
 
-  <symbol id="icon-trips" viewBox="0 0 20 20" fill="none">
-    <path d="M5 18.3333C6.38071 18.3333 7.5 17.214 7.5 15.8333C7.5 14.4526 6.38071 13.3333 5 13.3333C3.61929 13.3333 2.5 14.4526 2.5 15.8333C2.5 17.214 3.61929 18.3333 5 18.3333Z" stroke="#93C5FD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M7.5 15.8333H14.5833C15.3569 15.8333 16.0987 15.526 16.6457 14.9791C17.1927 14.4321 17.5 13.6902 17.5 12.9167C17.5 12.1431 17.1927 11.4013 16.6457 10.8543C16.0987 10.3073 15.3569 10 14.5833 10H5.41667C4.64312 10 3.90125 9.69271 3.35427 9.14573C2.80729 8.59875 2.5 7.85689 2.5 7.08334C2.5 6.30979 2.80729 5.56792 3.35427 5.02094C3.90125 4.47396 4.64312 4.16667 5.41667 4.16667H12.5" stroke="#93C5FD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M15 6.66667C16.3807 6.66667 17.5 5.54738 17.5 4.16667C17.5 2.78596 16.3807 1.66667 15 1.66667C13.6193 1.66667 12.5 2.78596 12.5 4.16667C12.5 5.54738 13.6193 6.66667 15 6.66667Z" stroke="#93C5FD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Навигация: Рейсы -->
+  <symbol id="icon-trips" viewBox="0 0 20 20" fill="none" data-label="Рейсы" data-group="Навигация">
+    <path d="M5 18.3333C6.38071 18.3333 7.5 17.214 7.5 15.8333C7.5 14.4526 6.38071 13.3333 5 13.3333C3.61929 13.3333 2.5 14.4526 2.5 15.8333C2.5 17.214 3.61929 18.3333 5 18.3333Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7.5 15.8333H14.5833C15.3569 15.8333 16.0987 15.526 16.6457 14.9791C17.1927 14.4321 17.5 13.6902 17.5 12.9167C17.5 12.1431 17.1927 11.4013 16.6457 10.8543C16.0987 10.3073 15.3569 10 14.5833 10H5.41667C4.64312 10 3.90125 9.69271 3.35427 9.14573C2.80729 8.59875 2.5 7.85689 2.5 7.08334C2.5 6.30979 2.80729 5.56792 3.35427 5.02094C3.90125 4.47396 4.64312 4.16667 5.41667 4.16667H12.5" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M15 6.66667C16.3807 6.66667 17.5 5.54738 17.5 4.16667C17.5 2.78596 16.3807 1.66667 15 1.66667C13.6193 1.66667 12.5 2.78596 12.5 4.16667C12.5 5.54738 13.6193 6.66667 15 6.66667Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
 
-  <symbol id="icon-drivers" viewBox="0 0 20 20" fill="none">
+  <!-- Навигация: Водители -->
+  <symbol id="icon-drivers" viewBox="0 0 20 20" fill="none" data-label="Водители" data-group="Навигация">
     <circle cx="7" cy="6" r="2.5" stroke="currentColor" stroke-width="1.7"/>
     <path d="M2.5 15.5c0-2.3 2.2-4 4.5-4s4.5 1.7 4.5 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
     <circle cx="14.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.7"/>
     <path d="M12.2 15.5c.2-1.6 1.6-2.8 3.3-2.8 1 0 1.9.4 2.5 1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
   </symbol>
 
-  <symbol id="icon-settings" viewBox="0 0 20 20" fill="none">
-    <path d="M10.1833 1.66666H9.81667C9.37464 1.66666 8.95072 1.84225 8.63816 2.15481C8.3256 2.46737 8.15 2.8913 8.15 3.33332V3.48332C8.1497 3.77559 8.07255 4.06265 7.92628 4.31569C7.78002 4.56873 7.56978 4.77885 7.31667 4.92499L6.95834 5.13332C6.70497 5.2796 6.41756 5.35661 6.125 5.35661C5.83244 5.35661 5.54503 5.2796 5.29167 5.13332L5.16667 5.06666C4.78422 4.84604 4.32987 4.78619 3.90334 4.90025C3.47681 5.0143 3.11296 5.29294 2.89167 5.67499L2.70833 5.99166C2.48772 6.3741 2.42787 6.82846 2.54192 7.25499C2.65598 7.68152 2.93461 8.04536 3.31667 8.26666L3.44167 8.34999C3.69356 8.49542 3.90302 8.70423 4.04921 8.95568C4.1954 9.20713 4.27325 9.49247 4.275 9.78332V10.2083C4.27617 10.502 4.19971 10.7908 4.05337 11.0454C3.90703 11.3 3.69601 11.5115 3.44167 11.6583L3.31667 11.7333C2.93461 11.9546 2.65598 12.3185 2.54192 12.745C2.42787 13.1715 2.48772 13.6259 2.70833 14.0083L2.89167 14.325C3.11296 14.707 3.47681 14.9857 3.90334 15.0997C4.32987 15.2138 4.78422 15.1539 5.16667 14.9333L5.29167 14.8667C5.54503 14.7204 5.83244 14.6434 6.125 14.6434C6.41756 14.6434 6.70497 14.7204 6.95834 14.8667L7.31667 15.075C7.56978 15.2211 7.78002 15.4313 7.92628 15.6843C8.07255 15.9373 8.1497 16.2244 8.15 16.5167V16.6667C8.15 17.1087 8.3256 17.5326 8.63816 17.8452C8.95072 18.1577 9.37464 18.3333 9.81667 18.3333H10.1833C10.6254 18.3333 11.0493 18.1577 11.3618 17.8452C11.6744 17.5326 11.85 17.1087 11.85 16.6667V16.5167C11.8503 16.2244 11.9275 15.9373 12.0737 15.6843C12.22 15.4313 12.4302 15.2211 12.6833 15.075L13.0417 14.8667C13.295 14.7204 13.5824 14.6434 13.875 14.6434C14.1676 14.6434 14.455 14.7204 14.7083 14.8667L14.8333 14.9333C15.2158 15.1539 15.6701 15.2138 16.0967 15.0997C16.5232 14.9857 16.887 14.707 17.1083 14.325L17.2917 14C17.5123 13.6175 17.5721 13.1632 17.4581 12.7367C17.344 12.3101 17.0654 11.9463 16.6833 11.725L16.5583 11.6583C16.304 11.5115 16.093 11.3 15.9466 11.0454C15.8003 10.7908 15.7238 10.502 15.725 10.2083V9.79166C15.7238 9.49797 15.8003 9.2092 15.9466 8.95457C16.093 8.69994 16.304 8.4885 16.5583 8.34166L16.6833 8.26666C17.0654 8.04536 17.344 7.68152 17.4581 7.25499C17.5721 6.82846 17.5123 6.3741 17.2917 5.99166L17.1083 5.67499C16.887 5.29294 16.5232 5.0143 16.0967 4.90025C15.6701 4.78619 15.2158 4.84604 14.8333 5.06666L14.7083 5.13332C14.455 5.2796 14.1676 5.35661 13.875 5.35661C13.5824 5.35661 13.295 5.2796 13.0417 5.13332L12.6833 4.92499C12.4302 4.77885 12.22 4.56873 12.0737 4.31569C11.9275 4.06265 11.8503 3.77559 11.85 3.48332V3.33332C11.85 2.8913 11.6744 2.46737 11.3618 2.15481C11.0493 1.84225 10.6254 1.66666 10.1833 1.66666Z" stroke="#93C5FD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="#93C5FD" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Навигация: Настройки -->
+  <symbol id="icon-settings" viewBox="0 0 20 20" fill="none" data-label="Настройки" data-group="Навигация">
+    <path d="M10.1833 1.66666H9.81667C9.37464 1.66666 8.95072 1.84225 8.63816 2.15481C8.3256 2.46737 8.15 2.8913 8.15 3.33332V3.48332C8.1497 3.77559 8.07255 4.06265 7.92628 4.31569C7.78002 4.56873 7.56978 4.77885 7.31667 4.92499L6.95834 5.13332C6.70497 5.2796 6.41756 5.35661 6.125 5.35661C5.83244 5.35661 5.54503 5.2796 5.29167 5.13332L5.16667 5.06666C4.78422 4.84604 4.32987 4.78619 3.90334 4.90025C3.47681 5.0143 3.11296 5.29294 2.89167 5.67499L2.70833 5.99166C2.48772 6.3741 2.42787 6.82846 2.54192 7.25499C2.65598 7.68152 2.93461 8.04536 3.31667 8.26666L3.44167 8.34999C3.69356 8.49542 3.90302 8.70423 4.04921 8.95568C4.1954 9.20713 4.27325 9.49247 4.275 9.78332V10.2083C4.27617 10.502 4.19971 10.7908 4.05337 11.0454C3.90703 11.3 3.69601 11.5115 3.44167 11.6583L3.31667 11.7333C2.93461 11.9546 2.65598 12.3185 2.54192 12.745C2.42787 13.1715 2.48772 13.6259 2.70833 14.0083L2.89167 14.325C3.11296 14.707 3.47681 14.9857 3.90334 15.0997C4.32987 15.2138 4.78422 15.1539 5.16667 14.9333L5.29167 14.8667C5.54503 14.7204 5.83244 14.6434 6.125 14.6434C6.41756 14.6434 6.70497 14.7204 6.95834 14.8667L7.31667 15.075C7.56978 15.2211 7.78002 15.4313 7.92628 15.6843C8.07255 15.9373 8.1497 16.2244 8.15 16.5167V16.6667C8.15 17.1087 8.3256 17.5326 8.63816 17.8452C8.95072 18.1577 9.37464 18.3333 9.81667 18.3333H10.1833C10.6254 18.3333 11.0493 18.1577 11.3618 17.8452C11.6744 17.5326 11.85 17.1087 11.85 16.6667V16.5167C11.8503 16.2244 11.9275 15.9373 12.0737 15.6843C12.22 15.4313 12.4302 15.2211 12.6833 15.075L13.0417 14.8667C13.295 14.7204 13.5824 14.6434 13.875 14.6434C14.1676 14.6434 14.455 14.7204 14.7083 14.8667L14.8333 14.9333C15.2158 15.1539 15.6701 15.2138 16.0967 15.0997C16.5232 14.9857 16.887 14.707 17.1083 14.325L17.2917 14C17.5123 13.6175 17.5721 13.1632 17.4581 12.7367C17.344 12.3101 17.0654 11.9463 16.6833 11.725L16.5583 11.6583C16.304 11.5115 16.093 11.3 15.9466 11.0454C15.8003 10.7908 15.7238 10.502 15.725 10.2083V9.79166C15.7238 9.49797 15.8003 9.2092 15.9466 8.95457C16.093 8.69994 16.304 8.4885 16.5583 8.34166L16.6833 8.26666C17.0654 8.04536 17.344 7.68152 17.4581 7.25499C17.5721 6.82846 17.5123 6.3741 17.2917 5.99166L17.1083 5.67499C16.887 5.29294 16.5232 5.0143 16.0967 4.90025C15.6701 4.78619 15.2158 4.84604 14.8333 5.06666L14.7083 5.13332C14.455 5.2796 14.1676 5.35661 13.875 5.35661C13.5824 5.35661 13.295 5.2796 13.0417 5.13332L12.6833 4.92499C12.4302 4.77885 12.22 4.56873 12.0737 4.31569C11.9275 4.06265 11.8503 3.77559 11.85 3.48332V3.33332C11.85 2.8913 11.6744 2.46737 11.3618 2.15481C11.0493 1.84225 10.6254 1.66666 10.1833 1.66666Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
 
-  <symbol id="icon-auth-truck" viewBox="0 0 24 24" fill="none">
+  <!-- Интерфейс: Грузовик -->
+  <symbol id="icon-truck" viewBox="0 0 24 24" fill="none" data-label="Грузовик" data-group="Интерфейс">
     <path d="M14 18V6C14 5.46957 13.7893 4.96086 13.4142 4.58579C13.0391 4.21071 12.5304 4 12 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V17C2 17.2652 2.10536 17.5196 2.29289 17.7071C2.48043 17.8946 2.73478 18 3 18H5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M15 18H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M19 18H21C21.2652 18 21.5196 17.8946 21.7071 17.7071C21.8946 17.5196 22 17.2652 22 17V13.35C21.9996 13.1231 21.922 12.903 21.78 12.726L18.3 8.376C18.2065 8.25888 18.0878 8.16428 17.9528 8.0992C17.8178 8.03412 17.6699 8.00021 17.52 8H14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -53,18 +60,195 @@
     <path d="M7 20C8.10457 20 9 19.1046 9 18C9 16.8954 8.10457 16 7 16C5.89543 16 5 16.8954 5 18C5 19.1046 5.89543 20 7 20Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
 
-  <symbol id="icon-auth-mail" viewBox="0 0 16 16" fill="none">
+  <!-- Статистика: График -->
+  <symbol id="icon-stat-chart" viewBox="0 0 24 24" fill="none" data-label="Статистика: График" data-group="Статистика">
+    <path d="M3 3V19C3 19.5304 3.21071 20.0391 3.58579 20.4142C3.96086 20.7893 4.46957 21 5 21H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M18 17V9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M13 17V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M8 17V14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Статистика: Водители -->
+  <symbol id="icon-stat-drivers" viewBox="0 0 20 20" fill="none" data-label="Статистика: Водители" data-group="Статистика">
+    <path d="M13.3333 17.5V15.8333C13.3333 14.9493 12.9821 14.1014 12.357 13.4763C11.7319 12.8512 10.8841 12.5 10 12.5H5C4.11595 12.5 3.2681 12.8512 2.64298 13.4763C2.01786 14.1014 1.66667 14.9493 1.66667 15.8333V17.5" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M7.5 9.16667C9.34095 9.16667 10.8333 7.67428 10.8333 5.83333C10.8333 3.99238 9.34095 2.5 7.5 2.5C5.65905 2.5 4.16667 3.99238 4.16667 5.83333C4.16667 7.67428 5.65905 9.16667 7.5 9.16667Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M18.3333 17.5V15.8333C18.3328 15.0948 18.087 14.3773 17.6345 13.7936C17.182 13.2099 16.5484 12.793 15.8333 12.6083" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M13.3333 2.60834C14.0503 2.79192 14.6859 3.20892 15.1397 3.7936C15.5935 4.37827 15.8399 5.09736 15.8399 5.8375C15.8399 6.57765 15.5935 7.29674 15.1397 7.88141C14.6859 8.46609 14.0503 8.88309 13.3333 9.06667" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Статистика: Стрелка вверх -->
+  <symbol id="icon-up-arrow" viewBox="0 0 20 20" fill="none" data-label="Стрелка вверх" data-group="Статистика">
+    <path d="M18.3333 5.83333L11.25 12.9167L7.08333 8.75L1.66667 14.1667" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M13.3333 5.83333H18.3333V10.8333" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Авторизация: Почта -->
+  <symbol id="icon-auth-mail" viewBox="0 0 16 16" fill="none" data-label="Авторизация: Почта" data-group="Авторизация">
     <path d="M13.3333 2.66667H2.66667C1.93029 2.66667 1.33333 3.26362 1.33333 4V12C1.33333 12.7364 1.93029 13.3333 2.66667 13.3333H13.3333C14.0697 13.3333 14.6667 12.7364 14.6667 12V4C14.6667 3.26362 14.0697 2.66667 13.3333 2.66667Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M14.6667 4.66667L8.68667 8.46667C8.48085 8.59562 8.24288 8.66401 8 8.66401C7.75712 8.66401 7.51915 8.59562 7.31333 8.46667L1.33333 4.66667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
 
-  <symbol id="icon-auth-lock" viewBox="0 0 16 16" fill="none">
+  <!-- Авторизация: Замок -->
+  <symbol id="icon-auth-lock" viewBox="0 0 16 16" fill="none" data-label="Авторизация: Замок" data-group="Авторизация">
     <path d="M12.6667 7.33333H3.33333C2.59695 7.33333 2 7.93029 2 8.66667V13.3333C2 14.0697 2.59695 14.6667 3.33333 14.6667H12.6667C13.403 14.6667 14 14.0697 14 13.3333V8.66667C14 7.93029 13.403 7.33333 12.6667 7.33333Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M4.66667 7.33333V4.66667C4.66667 3.78261 5.01786 2.93477 5.64298 2.30964C6.2681 1.68452 7.11594 1.33333 8 1.33333C8.88405 1.33333 9.7319 1.68452 10.357 2.30964C10.9821 2.93477 11.3333 3.78261 11.3333 4.66667V7.33333" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
 
-  <symbol id="icon-auth-arrow-right" viewBox="0 0 16 16" fill="none">
+  <!-- Авторизация: Стрелка вправо -->
+  <symbol id="icon-auth-arrow-right" viewBox="0 0 16 16" fill="none" data-label="Авторизация: Стрелка вправо" data-group="Авторизация">
     <path d="M3.33333 8H12.6667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
     <path d="M8 3.33333L12.6667 8L8 12.6667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
   </symbol>
+
+  <!-- Документация: Галочка -->
+  <symbol id="icon-doc-check" viewBox="0 0 56 56" fill="none" data-label="Галочка" data-group="Документация">
+    <path d="M46.6668 14L21.0002 39.6667L9.3335 28" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Двойная галочка -->
+  <symbol id="icon-doc-checkcheck" viewBox="0 0 12 12" fill="none" data-label="Двойная галочка" data-group="Документация">
+    <g clip-path="url(#clip0_45_1079)"><path d="M9 3L3.5 8.5L1 6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 5L7.25 8.75L6.5 8" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_45_1079"><rect width="12" height="12" fill="currentColor"/></clipPath></defs>
+  </symbol>
+
+  <!-- Документация: Календарь -->
+  <symbol id="icon-doc-date" viewBox="0 0 20 20" fill="none" data-label="Календарь" data-group="Документация">
+    <path d="M6.66675 1.66666V4.99999" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.3333 1.66666V4.99999" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.8333 3.33334H4.16667C3.24619 3.33334 2.5 4.07954 2.5 5.00001V16.6667C2.5 17.5872 3.24619 18.3333 4.16667 18.3333H15.8333C16.7538 18.3333 17.5 17.5872 17.5 16.6667V5.00001C17.5 4.07954 16.7538 3.33334 15.8333 3.33334Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 8.33334H17.5" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Редактирование -->
+  <symbol id="icon-doc-edit" viewBox="0 0 16 16" fill="none" data-label="Редактирование" data-group="Документация">
+    <path d="M8 2H3.33333C2.97971 2 2.64057 2.14048 2.39052 2.39052C2.14048 2.64057 2 2.97971 2 3.33333V12.6667C2 13.0203 2.14048 13.3594 2.39052 13.6095C2.64057 13.8595 2.97971 14 3.33333 14H12.6667C13.0203 14 13.3594 13.8595 13.6095 13.6095C13.8595 13.3594 14 13.0203 14 12.6667V8" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/><path d="M12.2499 1.75C12.5151 1.48478 12.8748 1.33578 13.2499 1.33578C13.625 1.33578 13.9847 1.48478 14.2499 1.75C14.5151 2.01521 14.6641 2.37493 14.6641 2.75C14.6641 3.12507 14.5151 3.48478 14.2499 3.75L8.24123 9.75933C8.08293 9.9175 7.88737 10.0333 7.67257 10.096L5.75723 10.656C5.69987 10.6727 5.63906 10.6737 5.58117 10.6589C5.52329 10.6441 5.47045 10.614 5.4282 10.5717C5.38594 10.5294 5.35583 10.4766 5.341 10.4187C5.32617 10.3608 5.32717 10.3 5.3439 10.2427L5.9039 8.32733C5.96692 8.1127 6.08292 7.91737 6.24123 7.75933L12.2499 1.75Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Просмотр -->
+  <symbol id="icon-doc-eye" viewBox="0 0 16 16" fill="none" data-label="Просмотр" data-group="Документация">
+    <g clip-path="url(#clip0_6_138)"><path d="M1.37468 8.232C1.31912 8.08232 1.31912 7.91767 1.37468 7.768C1.91581 6.4559 2.83435 5.33402 4.01386 4.5446C5.19336 3.75517 6.58071 3.33374 8.00001 3.33374C9.41932 3.33374 10.8067 3.75517 11.9862 4.5446C13.1657 5.33402 14.0842 6.4559 14.6253 7.768C14.6809 7.91767 14.6809 8.08232 14.6253 8.232C14.0842 9.54409 13.1657 10.666 11.9862 11.4554C10.8067 12.2448 9.41932 12.6663 8.00001 12.6663C6.58071 12.6663 5.19336 12.2448 4.01386 11.4554C2.83435 10.666 1.91581 9.54409 1.37468 8.232Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_6_138"><rect width="16" height="16" fill="currentColor"/></clipPath></defs>
+  </symbol>
+
+  <!-- Документация: Банк -->
+  <symbol id="icon-doc-landmark" viewBox="0 0 20 20" fill="none" data-label="Банк" data-group="Документация">
+    <path d="M2.5 18.3333H17.5" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 15V9.16666" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.33325 15V9.16666" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6667 15V9.16666" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 15V9.16666" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.99992 1.66666L16.6666 5.83332H3.33325L9.99992 1.66666Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Стрелка влево -->
+  <symbol id="icon-doc-left-arrow" viewBox="0 0 20 20" fill="none" data-label="Стрелка влево" data-group="Документация">
+    <path d="M9.99984 15.8333L4.1665 10L9.99984 4.16667" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.8332 10H4.1665" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Ссылка -->
+  <symbol id="icon-doc-link" viewBox="0 0 20 20" fill="none" data-label="Ссылка" data-group="Документация">
+    <g clip-path="url(#clip0_10_429)"><path d="M8.33337 10.8333C8.69125 11.3118 9.14784 11.7077 9.67217 11.9941C10.1965 12.2806 10.7763 12.4509 11.3722 12.4936C11.9682 12.5363 12.5664 12.4503 13.1262 12.2415C13.686 12.0327 14.1943 11.7059 14.6167 11.2833L17.1167 8.78335C17.8757 7.9975 18.2957 6.94499 18.2862 5.85251C18.2767 4.76002 17.8385 3.71497 17.066 2.94243C16.2934 2.1699 15.2484 1.7317 14.1559 1.7222C13.0634 1.71271 12.0109 2.13269 11.225 2.89168L9.79171 4.31668" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6667 9.16665C11.3088 8.68821 10.8522 8.29233 10.3279 8.00587C9.80359 7.7194 9.22379 7.54905 8.62784 7.50637C8.03188 7.46369 7.43372 7.54968 6.87392 7.7585C6.31412 7.96732 5.80578 8.29409 5.38338 8.71665L2.88338 11.2167C2.12439 12.0025 1.70441 13.055 1.7139 14.1475C1.7234 15.24 2.1616 16.285 2.93413 17.0576C3.70667 17.8301 4.75172 18.2683 5.84421 18.2778C6.93669 18.2873 7.9892 17.8673 8.77504 17.1083L10.2 15.6833" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_10_429"><rect width="20" height="20" fill="currentColor"/></clipPath></defs>
+  </symbol>
+
+  <!-- Документация: Выход -->
+  <symbol id="icon-doc-logout" viewBox="0 0 16 16" fill="none" data-label="Выход" data-group="Документация">
+    <path d="M6 14H3.33333C2.97971 14 2.64057 13.8595 2.39052 13.6095C2.14048 13.3594 2 13.0203 2 12.6667V3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H6" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.6666 11.3333L14 8L10.6666 4.66667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 8H6" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Пользователь -->
+  <symbol id="icon-doc-man" viewBox="0 0 20 20" fill="none" data-label="Пользователь" data-group="Документация">
+    <path d="M15.8334 17.5V15.8333C15.8334 14.9493 15.4822 14.1014 14.8571 13.4763C14.232 12.8512 13.3841 12.5 12.5001 12.5H7.50008C6.61603 12.5 5.76818 12.8512 5.14306 13.4763C4.51794 14.1014 4.16675 14.9493 4.16675 15.8333V17.5" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.0001 9.16667C11.841 9.16667 13.3334 7.67428 13.3334 5.83333C13.3334 3.99238 11.841 2.5 10.0001 2.5C8.15913 2.5 6.66675 3.99238 6.66675 5.83333C6.66675 7.67428 8.15913 9.16667 10.0001 9.16667Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Сообщение -->
+  <symbol id="icon-doc-message" viewBox="0 0 16 16" fill="none" data-label="Сообщение" data-group="Документация">
+    <path d="M14 10C14 10.3536 13.8595 10.6928 13.6095 10.9428C13.3594 11.1929 13.0203 11.3333 12.6667 11.3333H4.66667L2 14V3.33333C2 2.97971 2.14048 2.64057 2.39052 2.39052C2.64057 2.14048 2.97971 2 3.33333 2H12.6667C13.0203 2 13.3594 2.14048 13.6095 2.39052C13.8595 2.64057 14 2.97971 14 3.33333V10Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Коробка -->
+  <symbol id="icon-doc-package" viewBox="0 0 20 20" fill="none" data-label="Коробка" data-group="Документация">
+    <path d="M9.16667 18.1084C9.42003 18.2546 9.70744 18.3316 10 18.3316C10.2926 18.3316 10.58 18.2546 10.8333 18.1084L16.6667 14.775C16.9198 14.6289 17.13 14.4188 17.2763 14.1657C17.4225 13.9127 17.4997 13.6256 17.5 13.3334V6.66669C17.4997 6.37442 17.4225 6.08736 17.2763 5.83432C17.13 5.58128 16.9198 5.37116 16.6667 5.22502L10.8333 1.89169C10.58 1.74541 10.2926 1.6684 10 1.6684C9.70744 1.6684 9.42003 1.74541 9.16667 1.89169L3.33333 5.22502C3.08022 5.37116 2.86998 5.58128 2.72372 5.83432C2.57745 6.08736 2.5003 6.37442 2.5 6.66669V13.3334C2.5003 13.6256 2.57745 13.9127 2.72372 14.1657C2.86998 14.4188 3.08022 14.6289 3.33333 14.775L9.16667 18.1084Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 18.3333V10" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.7417 5.83331L10 9.99998L17.2584 5.83331" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.25 3.55835L13.75 7.85002" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Коробка с отметкой -->
+  <symbol id="icon-doc-packagecheck" viewBox="0 0 20 20" fill="none" data-label="Коробка с отметкой" data-group="Документация">
+    <path d="M13.3333 13.3333L14.9999 15L18.3333 11.6666" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M17.5 8.33335V6.66669C17.4997 6.37442 17.4225 6.08736 17.2763 5.83432C17.13 5.58128 16.9198 5.37116 16.6667 5.22502L10.8333 1.89169C10.58 1.74541 10.2926 1.6684 10 1.6684C9.70744 1.6684 9.42003 1.74541 9.16667 1.89169L3.33333 5.22502C3.08022 5.37116 2.86998 5.58128 2.72372 5.83432C2.57745 6.08736 2.5003 6.37442 2.5 6.66669V13.3334C2.5003 13.6256 2.57745 13.9127 2.72372 14.1657C2.86998 14.4188 3.08022 14.6289 3.33333 14.775L9.16667 18.1084C9.42003 18.2546 9.70744 18.3316 10 18.3316C10.2926 18.3316 10.58 18.2546 10.8333 18.1084L12.5 17.1584" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.25 3.55835L13.75 7.85002" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.7417 5.83331L10 9.99998L17.2584 5.83331" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 18.3333V10" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Телефон -->
+  <symbol id="icon-doc-phone" viewBox="0 0 20 20" fill="none" data-label="Телефон" data-group="Документация">
+    <g clip-path="url(#clip0_13_796)"><path d="M18.3332 14.1V16.6C18.3341 16.8321 18.2866 17.0618 18.1936 17.2745C18.1006 17.4871 17.9643 17.678 17.7933 17.8349C17.6222 17.9918 17.4203 18.1113 17.2005 18.1856C16.9806 18.26 16.7477 18.2876 16.5165 18.2667C13.9522 17.9881 11.489 17.1118 9.32486 15.7084C7.31139 14.4289 5.60431 12.7219 4.32486 10.7084C2.91651 8.53438 2.04007 6.0592 1.76653 3.48337C1.7457 3.25293 1.77309 3.02067 1.84695 2.80139C1.9208 2.58211 2.03951 2.38061 2.1955 2.20972C2.3515 2.03883 2.54137 1.9023 2.75302 1.80881C2.96468 1.71532 3.19348 1.66692 3.42486 1.66671H5.92486C6.32928 1.66273 6.72136 1.80594 7.028 2.06965C7.33464 2.33336 7.53493 2.69958 7.59153 3.10004C7.69705 3.9001 7.89274 4.68565 8.17486 5.44171C8.28698 5.73998 8.31125 6.06414 8.24478 6.37577C8.17832 6.68741 8.02392 6.97347 7.79986 7.20004L6.74153 8.25837C7.92783 10.3447 9.65524 12.0721 11.7415 13.2584L12.7999 12.2C13.0264 11.976 13.3125 11.8216 13.6241 11.7551C13.9358 11.6887 14.2599 11.7129 14.5582 11.825C15.3143 12.1072 16.0998 12.3029 16.8999 12.4084C17.3047 12.4655 17.6744 12.6694 17.9386 12.9813C18.2029 13.2932 18.3433 13.6914 18.3332 14.1Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/></g><defs><clipPath id="clip0_13_796"><rect width="20" height="20" fill="currentColor"/></clipPath></defs>
+  </symbol>
+
+  <!-- Документация: Местоположение -->
+  <symbol id="icon-doc-place" viewBox="0 0 20 20" fill="none" data-label="Местоположение" data-group="Документация">
+    <path d="M16.6667 8.33335C16.6667 12.4942 12.0509 16.8275 10.5009 18.1659C10.3565 18.2744 10.1807 18.3331 10 18.3331C9.81938 18.3331 9.6436 18.2744 9.49921 18.1659C7.94921 16.8275 3.33337 12.4942 3.33337 8.33335C3.33337 6.56524 4.03575 4.86955 5.286 3.61931C6.53624 2.36907 8.23193 1.66669 10 1.66669C11.7682 1.66669 13.4638 2.36907 14.7141 3.61931C15.9643 4.86955 16.6667 6.56524 16.6667 8.33335Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 10.8333C11.3807 10.8333 12.5 9.71402 12.5 8.33331C12.5 6.9526 11.3807 5.83331 10 5.83331C8.61929 5.83331 7.5 6.9526 7.5 8.33331C7.5 9.71402 8.61929 10.8333 10 10.8333Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Плюс -->
+  <symbol id="icon-doc-plus" viewBox="0 0 16 16" fill="none" data-label="Плюс" data-group="Документация">
+    <path d="M3.3335 8H12.6668" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 3.33334V12.6667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Сохранить -->
+  <symbol id="icon-doc-save" viewBox="0 0 20 20" fill="none" data-label="Сохранить" data-group="Документация">
+    <path d="M12.6667 2.5C13.1063 2.50626 13.5256 2.68598 13.8333 3L17 6.16667C17.314 6.47438 17.4937 6.89372 17.5 7.33333V15.8333C17.5 16.2754 17.3244 16.6993 17.0118 17.0118C16.6993 17.3244 16.2754 17.5 15.8333 17.5H4.16667C3.72464 17.5 3.30072 17.3244 2.98816 17.0118C2.67559 16.6993 2.5 16.2754 2.5 15.8333V4.16667C2.5 3.72464 2.67559 3.30072 2.98816 2.98816C3.30072 2.67559 3.72464 2.5 4.16667 2.5H12.6667Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.1668 17.5V11.6667C14.1668 11.4457 14.079 11.2337 13.9228 11.0775C13.7665 10.9212 13.5545 10.8334 13.3335 10.8334H6.66683C6.44582 10.8334 6.23385 10.9212 6.07757 11.0775C5.92129 11.2337 5.8335 11.4457 5.8335 11.6667V17.5" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.8335 2.5V5.83333C5.8335 6.05435 5.92129 6.26631 6.07757 6.42259C6.23385 6.57887 6.44582 6.66667 6.66683 6.66667H12.5002" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Удалить -->
+  <symbol id="icon-doc-trash" viewBox="0 0 20 20" fill="none" data-label="Удалить" data-group="Документация">
+    <path d="M2.5 5H17.5" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.8332 5V16.6667C15.8332 17.5 14.9998 18.3333 14.1665 18.3333H5.83317C4.99984 18.3333 4.1665 17.5 4.1665 16.6667V5" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.6665 4.99996V3.33329C6.6665 2.49996 7.49984 1.66663 8.33317 1.66663H11.6665C12.4998 1.66663 13.3332 2.49996 13.3332 3.33329V4.99996" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.3335 9.16663V14.1666" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6665 9.16663V14.1666" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Документация: Портфель -->
+  <symbol id="icon-doc-briefcase" viewBox="0 0 16 16" fill="none" data-label="Портфель" data-group="Документация">
+    <g clip-path="url(#clip0_51_2021)">
+      <path d="M10.6666 13.3333V2.66659C10.6666 2.31296 10.5261 1.97382 10.2761 1.72378C10.026 1.47373 9.68687 1.33325 9.33325 1.33325H6.66659C6.31296 1.33325 5.97383 1.47373 5.72378 1.72378C5.47373 1.97382 5.33325 2.31296 5.33325 2.66659V13.3333" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M13.3333 4H2.66659C1.93021 4 1.33325 4.59695 1.33325 5.33333V12C1.33325 12.7364 1.93021 13.3333 2.66659 13.3333H13.3333C14.0696 13.3333 14.6666 12.7364 14.6666 12V5.33333C14.6666 4.59695 14.0696 4 13.3333 4Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <defs>
+      <clipPath id="clip0_51_2021">
+        <rect width="16" height="16" fill="currentColor"/>
+      </clipPath>
+    </defs>
+  </symbol>
+
+  <!-- Документация: Банковская карта -->
+  <symbol id="icon-doc-creditcard" viewBox="0 0 16 16" fill="none" data-label="Банковская карта" data-group="Документация">
+    <g clip-path="url(#clip0_51_1621)">
+      <path d="M13.3334 3.33337H2.66671C1.93033 3.33337 1.33337 3.93033 1.33337 4.66671V11.3334C1.33337 12.0698 1.93033 12.6667 2.66671 12.6667H13.3334C14.0698 12.6667 14.6667 12.0698 14.6667 11.3334V4.66671C14.6667 3.93033 14.0698 3.33337 13.3334 3.33337Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M1.33337 6.66663H14.6667" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <defs>
+      <clipPath id="clip0_51_1621">
+        <rect width="16" height="16" fill="currentColor"/>
+      </clipPath>
+    </defs>
+  </symbol>
+
+  <!-- Интерфейс: Поиск -->
+  <symbol id="icon-search" viewBox="0 0 20 20" fill="none" data-label="Поиск" data-group="Интерфейс">
+    <path d="M9 3a6 6 0 1 1 0 12 6 6 0 0 1 0-12Zm0 1.5a4.5 4.5 0 1 0 0 9 4.5 4.5 0 0 0 0-9Zm5.56 9.99 2.97 2.97a.75.75 0 0 1-1.06 1.06l-2.97-2.97a.75.75 0 1 1 1.06-1.06Z" fill="currentColor"/>
+  </symbol>
+
+  <!-- Интерфейс: Копировать -->
+  <symbol id="icon-copy" viewBox="0 0 16 16" fill="none" data-label="Копировать" data-group="Интерфейс">
+    <path d="M13.3334 5.33331H6.66671C5.93033 5.33331 5.33337 5.93027 5.33337 6.66665V13.3333C5.33337 14.0697 5.93033 14.6666 6.66671 14.6666H13.3334C14.0698 14.6666 14.6667 14.0697 14.6667 13.3333V6.66665C14.6667 5.93027 14.0698 5.33331 13.3334 5.33331Z" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M2.66671 10.6666C1.93337 10.6666 1.33337 10.0666 1.33337 9.33331V2.66665C1.33337 1.93331 1.93337 1.33331 2.66671 1.33331H9.33337C10.0667 1.33331 10.6667 1.93331 10.6667 2.66665" stroke="currentColor" stroke-width="1.33333" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <!-- Интерфейс: Время -->
+  <symbol id="icon-time" viewBox="0 0 20 20" fill="none" data-label="Время" data-group="Интерфейс">
+    <g clip-path="url(#clip_driver_time)">
+      <path d="M10 18.3333C14.6024 18.3333 18.3333 14.6024 18.3333 10C18.3333 5.39763 14.6024 1.66667 10 1.66667C5.39763 1.66667 1.66667 5.39763 1.66667 10C1.66667 14.6024 5.39763 18.3333 10 18.3333Z" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M10 5V10L13.3333 11.6667" stroke="currentColor" stroke-width="1.66667" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <defs>
+      <clipPath id="clip_driver_time">
+        <rect width="20" height="20" fill="currentColor"/>
+      </clipPath>
+    </defs>
+  </symbol>
+
+  <!-- Интерфейс: Рубль -->
+  <symbol id="icon-rubl" viewBox="0 0 72.5 100" fill="none" data-label="Рубль" data-group="Интерфейс">
+    <path d="M5 0h40a27.5 27.5 0 0 1 0 55h-30v6h38v10h-38v29h-10v-29h-5v-10h5v-6h-5v-10h5zM15 10h30a17.5 17.5 0 0 1 0 35h-30z" fill="currentColor" fill-rule="evenodd"/>
+  </symbol>
+
+  <!-- Водитель: Стрелка маршрута -->
+  <symbol id="icon-driver-arrow" viewBox="0 0 24 24" fill="none" data-label="Стрелка маршрута" data-group="Водитель">
+    <path d="M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M12 5L19 12L12 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
 </svg>

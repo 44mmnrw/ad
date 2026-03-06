@@ -43,7 +43,7 @@
                 <span>ИНН</span>
                 <div class="cp-inline-form__input-with-action">
                     <input type="text" name="inn" value="{{ old('inn', $counterparty->inn) }}" placeholder="7701234567" data-dadata-query-input>
-                    <button type="button" class="cp-inline-form__field-action" data-dadata-fill-btn>DaData</button>
+                    <button type="button" class="ad-btn" data-dadata-fill-btn>DaData</button>
                 </div>
                 <small class="cp-inline-form__hint">Вставьте ИНН/ОГРН и нажмите DaData (или просто выйдите из поля).</small>
                 <p class="cp-dadata-fill__status" data-dadata-fill-status hidden></p>
