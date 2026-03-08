@@ -66,7 +66,7 @@
         </section>
 
         <section class="settings-card" aria-label="Параметры API Яндекс Карт">
-            <form action="{{ route('settings.yandex_maps.update') }}" method="post" class="settings-form">
+            <form action="{{ route('settings.yandex_maps.update') }}" method="post" class="settings-form settings-form--stack">
                 @csrf
                 @method('PUT')
 
@@ -74,6 +74,31 @@
                     <span>API key Яндекс Карт</span>
                     <input type="text" name="yandex_static_api_key" value="{{ old('yandex_static_api_key', $yandexStaticApiKey) }}" placeholder="Введите API-ключ Static Maps API (опционально)">
                 </label>
+
+                <label class="settings-form__field">
+                    <span>JavaScript API v3</span>
+                    <input type="text" name="yandex_js_api_key" value="{{ old('yandex_js_api_key', $yandexJsApiKey) }}" placeholder="Введите отдельный API-ключ для Yandex Maps JS API v3">
+                </label>
+
+                <label class="settings-form__field">
+                    <span>HTTP Геокодер</span>
+                    <input type="text" name="yandex_http_geocoder_api_key" value="{{ old('yandex_http_geocoder_api_key', $yandexHttpGeocoderApiKey) }}" placeholder="Введите API-ключ для HTTP Геокодера Яндекса">
+                </label>
+
+                <label class="settings-form__field">
+                    <span>API key Router (детали маршрута)</span>
+                    <input type="text" name="yandex_router_api_key" value="{{ old('yandex_router_api_key', $yandexRouterApiKey ?? '') }}" placeholder="Введите API-ключ для ymaps3.route (опционально)">
+                </label>
+
+                <label class="settings-form__field">
+                    <span>API key Яндекс Геосаджест</span>
+                    <input type="text" name="yandex_geosuggest_api_key" value="{{ old('yandex_geosuggest_api_key', $yandexGeosuggestApiKey) }}" placeholder="Введите API-ключ Geosuggest API (для подсказок города)">
+                </label>
+
+                <p class="settings-page__hint" role="note">
+                    Для честного подключения Yandex Maps v3 нужен отдельный JS API ключ с ограничением по HTTP Referer.
+                    Старый объединённый ключ оставлен только как резерв для обратной совместимости.
+                </p>
 
                 <div class="settings-form__actions">
                     <button type="submit" class="ad-btn">Сохранить</button>

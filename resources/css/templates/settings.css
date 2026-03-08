@@ -34,6 +34,11 @@
     grid-template-columns: 1fr auto;
 }
 
+.settings-form--stack {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+}
+
 .settings-form__field {
     display: flex;
     flex-direction: column;
@@ -69,6 +74,12 @@
     font-size: 0.875rem;
     line-height: 1.25rem;
     padding: 0.625rem 0.75rem;
+}
+
+.settings-form__help {
+    color: var(--ad-slate-500);
+    font-size: 0.75rem;
+    line-height: 1rem;
 }
 
 .settings-form__actions {

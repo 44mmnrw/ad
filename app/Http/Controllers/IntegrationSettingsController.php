@@ -7,6 +7,7 @@ use App\Services\DaData\FindPartyService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class IntegrationSettingsController extends Controller
@@ -17,7 +18,11 @@ class IntegrationSettingsController extends Controller
             'activeMenu' => 'settings',
             'apiKey' => (string) IntegrationSetting::getValue('dadata', 'api_key', config('services.dadata.api_key')),
             'secretKey' => (string) IntegrationSetting::getValue('dadata', 'secret_key', config('services.dadata.secret_key')),
-            'yandexStaticApiKey' => (string) IntegrationSetting::getValue('yandex_maps', 'static_api_key', config('services.yandex_maps.static_api_key')),
+            'yandexStaticApiKey' => $this->resolveYandexMapsSetting(['static_api_key']) ?? '',
+            'yandexJsApiKey' => $this->resolveYandexMapsSetting(['js_api_key', 'js_http_geocoder_api_key']) ?? '',
+            'yandexHttpGeocoderApiKey' => $this->resolveYandexMapsSetting(['http_geocoder_api_key', 'geocoder_api_key', 'js_http_geocoder_api_key', 'static_api_key']) ?? '',
+            'yandexRouterApiKey' => $this->resolveYandexMapsSetting(['router_api_key']) ?? '',
+            'yandexGeosuggestApiKey' => $this->resolveYandexMapsSetting(['geosuggest_api_key', 'js_http_geocoder_api_key']) ?? '',
             'timeout' => $this->resolveTimeout(),
         ]);
     }
@@ -43,9 +48,19 @@ class IntegrationSettingsController extends Controller
     {
         $validated = $request->validate([
             'yandex_static_api_key' => ['nullable', 'string', 'max:255'],
+            'yandex_js_api_key' => ['nullable', 'string', 'max:255'],
+            'yandex_http_geocoder_api_key' => ['nullable', 'string', 'max:255'],
+            'yandex_router_api_key' => ['nullable', 'string', 'max:255'],
+            'yandex_geosuggest_api_key' => ['nullable', 'string', 'max:255'],
         ]);
 
-        IntegrationSetting::setValue('yandex_maps', 'static_api_key', $validated['yandex_static_api_key'] ?: null);
+        DB::transaction(function () use ($validated): void {
+            IntegrationSetting::setValue('yandex_maps', 'static_api_key', $validated['yandex_static_api_key'] ?: null);
+            IntegrationSetting::setValue('yandex_maps', 'js_api_key', $validated['yandex_js_api_key'] ?: null);
+            IntegrationSetting::setValue('yandex_maps', 'http_geocoder_api_key', $validated['yandex_http_geocoder_api_key'] ?: null);
+            IntegrationSetting::setValue('yandex_maps', 'router_api_key', $validated['yandex_router_api_key'] ?: null);
+            IntegrationSetting::setValue('yandex_maps', 'geosuggest_api_key', $validated['yandex_geosuggest_api_key'] ?: null);
+        });
 
         return redirect()
             ->route('settings.dadata.edit')
@@ -86,5 +101,21 @@ class IntegrationSettingsController extends Controller
         }
 
         return $fallback;
+    }
+
+    /**
+     * @param list<string> $keys
+     */
+    private function resolveYandexMapsSetting(array $keys): ?string
+    {
+        foreach ($keys as $key) {
+            $value = trim((string) IntegrationSetting::getValue('yandex_maps', $key, config("services.yandex_maps.{$key}")));
+
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        return null;
     }
 }

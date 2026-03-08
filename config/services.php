@@ -37,6 +37,15 @@ return [
 
     'yandex_maps' => [
         'static_api_key' => env('YANDEX_STATIC_MAPS_API_KEY'),
+        'js_http_geocoder_api_key' => env('YANDEX_JS_HTTP_GEOCODER_API_KEY'),
+        'js_api_key' => env('YANDEX_JS_API_KEY', env('YANDEX_JS_HTTP_GEOCODER_API_KEY')),
+        'http_geocoder_api_key' => env('YANDEX_HTTP_GEOCODER_API_KEY', env('YANDEX_GEOCODER_API_KEY', env('YANDEX_JS_HTTP_GEOCODER_API_KEY'))),
+        'geocoder_api_key' => env('YANDEX_GEOCODER_API_KEY', env('YANDEX_HTTP_GEOCODER_API_KEY', env('YANDEX_JS_HTTP_GEOCODER_API_KEY'))),
+        'geocoder_url' => env('YANDEX_GEOCODER_URL', 'https://geocode-maps.yandex.ru/1.x/'),
+        'router_api_key' => env('YANDEX_ROUTER_API_KEY'),
+        'geosuggest_api_key' => env('YANDEX_GEOSUGGEST_API_KEY', env('YANDEX_JS_HTTP_GEOCODER_API_KEY')),
+        'geosuggest_url' => env('YANDEX_GEOSUGGEST_URL', 'https://suggest-maps.yandex.ru/v1/suggest'),
+        'timeout' => (int) env('YANDEX_GEOCODER_TIMEOUT', 10),
     ],
 
     'dadata' => [

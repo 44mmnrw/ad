@@ -15,6 +15,6 @@
             </a>
         </div>
 
-        @include('orders._form', ['order' => $order])
+        @include('orders._form', ['order' => $order, 'counterparties' => $counterparties ?? []])
     </div>
 @endsection

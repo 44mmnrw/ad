@@ -114,11 +114,11 @@ button {
 }
 
 /* Единый цвет SVG при отсутствии специальных значений */
-:where([fill]:not([fill='none'], [fill^='url'])) {
+:where([fill]:not([fill='none'], [fill^='url'])):not([data-order-route-map] *) {
     fill: currentColor;
 }
 
-:where([stroke]:not([stroke='none'], [stroke^='url'])) {
+:where([stroke]:not([stroke='none'], [stroke^='url'])):not([data-order-route-map] *) {
     stroke: currentColor;
 }
 
@@ -130,6 +130,11 @@ svg * {
 :where(table) {
     border-collapse: collapse;
     border-color: currentColor;
+}
+
+/* Нативное скрытие по атрибуту hidden */
+:where([hidden]) {
+    display: none !important;
 }
 
 /* Предпочтение снижения анимации */
