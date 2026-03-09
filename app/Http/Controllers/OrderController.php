@@ -391,11 +391,8 @@ class OrderController extends Controller
                 ?? ''
             ));
             $name = $shortName !== '' ? $shortName : ($fullName !== '' ? $fullName : trim((string) ($suggestion['value'] ?? '')));
-            $contactName = trim((string) (
-                data_get($data, 'management.name')
-                ?? data_get($data, 'fio.name')
-                ?? ''
-            ));
+            $managerAttributes = $this->extractManagerAttributesFromDaDataParty($data);
+            $contactName = trim((string) ($managerAttributes['manager_name'] ?? ''));
             $phone = trim((string) (
                 data_get($data, 'phones.0.value')
                 ?? data_get($data, 'phones.0.data.value')
@@ -419,7 +416,7 @@ class OrderController extends Controller
                     'inn' => (string) ($data['inn'] ?? $query),
                     'kpp' => trim((string) ($data['kpp'] ?? '')),
                     'ogrn' => trim((string) (($data['ogrn'] ?? $data['ogrnip'] ?? ''))),
-                ], $this->extractLegalAddressAttributesFromDaDataParty($data)),
+                ], $this->extractLegalAddressAttributesFromDaDataParty($data), $managerAttributes),
             ]);
         } catch (Throwable $exception) {
             return response()->json([
@@ -441,7 +438,8 @@ class OrderController extends Controller
             'ogrn' => ['nullable', 'string', 'max:15'],
             'phone' => ['nullable', 'string', 'max:20'],
             'legal_address' => ['nullable', 'string', 'max:1000'],
-            'actual_address' => ['nullable', 'string', 'max:1000'],
+            'manager_name' => ['nullable', 'string', 'max:255'],
+            'manager_post' => ['nullable', 'string', 'max:255'],
             'legal_postal_code' => ['nullable', 'string', 'max:10'],
             'legal_region' => ['nullable', 'string', 'max:150'],
             'legal_city' => ['nullable', 'string', 'max:150'],
@@ -651,7 +649,7 @@ class OrderController extends Controller
 
         if ($counterpartyId !== null) {
             $existingCounterparty = DB::table('counterparties')
-                ->select('id', 'type', 'ceo')
+                ->select('id', 'type', 'manager_name', 'manager_post')
                 ->where('id', $counterpartyId)
                 ->first();
         }
@@ -659,14 +657,14 @@ class OrderController extends Controller
         if ($existingCounterparty === null && $customerId !== null) {
             $existingCounterparty = DB::table('customers as c')
                 ->join('counterparties as cp', 'cp.id', '=', 'c.counterparty_id')
-                ->select('cp.id', 'cp.type', 'cp.ceo')
+                ->select('cp.id', 'cp.type', 'cp.manager_name', 'cp.manager_post')
                 ->where('c.id', $customerId)
                 ->first();
         }
 
         if ($existingCounterparty === null && $customerInn !== '') {
             $existingCounterparty = DB::table('counterparties')
-                ->select('id', 'type', 'ceo')
+                ->select('id', 'type', 'manager_name', 'manager_post')
                 ->where('inn', $customerInn)
                 ->orderBy('id')
                 ->first();
@@ -674,7 +672,7 @@ class OrderController extends Controller
 
         if ($existingCounterparty === null) {
             $existingCounterparty = DB::table('counterparties')
-                ->select('id', 'type', 'ceo')
+                ->select('id', 'type', 'manager_name', 'manager_post')
                 ->where(function ($builder) use ($customerName): void {
                     $builder->where('short_name', $customerName)
                         ->orWhere('full_name', $customerName);
@@ -692,9 +690,14 @@ class OrderController extends Controller
             'short_name' => $customerName,
             'full_name' => $customerName,
             'inn' => $customerInn !== '' ? $customerInn : null,
-            'ceo' => $customerContactName !== ''
+            'manager_name' => $customerContactName !== ''
                 ? $customerContactName
-                : (trim((string) ($existingCounterparty->ceo ?? '')) !== '' ? trim((string) $existingCounterparty->ceo) : $customerName),
+                : (trim((string) ($existingCounterparty->manager_name ?? '')) !== ''
+                    ? trim((string) $existingCounterparty->manager_name)
+                    : null),
+            'manager_post' => trim((string) ($existingCounterparty->manager_post ?? '')) !== ''
+                ? trim((string) $existingCounterparty->manager_post)
+                : null,
             'phone' => $customerPhone,
             'email' => $customerEmail !== '' ? $customerEmail : null,
             'updated_at' => $now,
@@ -1087,7 +1090,8 @@ class OrderController extends Controller
                 'cp.inn',
                 'cp.phone',
                 'cp.email',
-                'cp.ceo',
+                'cp.manager_name',
+                'cp.manager_post',
                 'cp.legal_address',
                 'cp.legal_postal_code',
                 'cp.legal_region',
@@ -1137,10 +1141,14 @@ class OrderController extends Controller
             'counterparty_id' => (int) $row->counterparty_id,
             'contact_id' => is_numeric($contact->id ?? null) ? (int) $contact->id : null,
             'name' => $this->resolveCounterpartyDisplayName($row),
-            'contact_name' => $contactName !== '' ? $contactName : trim((string) ($row->ceo ?? '')),
+            'contact_name' => $contactName !== ''
+                ? $contactName
+                : trim((string) ($row->manager_name ?? '')),
             'phone' => $contactPhone !== '' ? $contactPhone : trim((string) ($row->phone ?? '')),
             'email' => $contactEmail !== '' ? $contactEmail : trim((string) ($row->email ?? '')),
             'inn' => trim((string) ($row->inn ?? '')),
+            'manager_name' => trim((string) ($row->manager_name ?? '')),
+            'manager_post' => trim((string) ($row->manager_post ?? '')),
             'legal_address' => trim((string) ($row->legal_address ?? '')),
             'legal_postal_code' => trim((string) ($row->legal_postal_code ?? '')),
             'legal_region' => trim((string) ($row->legal_region ?? '')),
@@ -1511,14 +1519,14 @@ class OrderController extends Controller
     }
 
     /**
-     * @return list<array{id: int, name: string, label: string, phone: string, inn: string, short_name: string, full_name: string, legal_address: string, actual_address: string, type_kind: string, source: string}>
+     * @return list<array{id: int, name: string, label: string, phone: string, inn: string, short_name: string, full_name: string, legal_address: string, type_kind: string, source: string}>
      */
     private function searchLocalParticipantCounterparties(string $query): array
     {
         $rows = DB::table('counterparties as cp')
             ->leftJoin('customers as c', 'c.counterparty_id', '=', 'cp.id')
             ->leftJoin('counterparties_type as cpt', 'cpt.id', '=', 'cp.type')
-            ->select('cp.id', 'c.id as customer_id', 'cp.short_name', 'cp.full_name', 'cp.inn', 'cp.kpp', 'cp.ogrn', 'cp.phone', 'cp.email', 'cp.ceo', 'cp.legal_address', 'cp.actual_address', 'cp.legal_postal_code', 'cp.legal_region', 'cp.legal_city', 'cp.legal_settlement', 'cp.legal_street', 'cp.legal_house', 'cp.legal_block', 'cp.legal_flat', 'cp.legal_fias_id', 'cp.legal_kladr_id', 'cp.legal_geo_lat', 'cp.legal_geo_lon', 'cp.legal_qc', 'cp.legal_qc_geo', 'cp.legal_address_invalid', 'cp.legal_address_data', 'cpt.name as type_name')
+            ->select('cp.id', 'c.id as customer_id', 'cp.short_name', 'cp.full_name', 'cp.inn', 'cp.kpp', 'cp.ogrn', 'cp.phone', 'cp.email', 'cp.manager_name', 'cp.manager_post', 'cp.legal_address', 'cp.legal_postal_code', 'cp.legal_region', 'cp.legal_city', 'cp.legal_settlement', 'cp.legal_street', 'cp.legal_house', 'cp.legal_block', 'cp.legal_flat', 'cp.legal_fias_id', 'cp.legal_kladr_id', 'cp.legal_geo_lat', 'cp.legal_geo_lon', 'cp.legal_qc', 'cp.legal_qc_geo', 'cp.legal_address_invalid', 'cp.legal_address_data', 'cpt.name as type_name')
             ->where(function ($builder) use ($query): void {
                 $builder->where('cp.short_name', 'like', "%{$query}%")
                     ->orWhere('cp.full_name', 'like', "%{$query}%")
@@ -1546,11 +1554,12 @@ class OrderController extends Controller
                 'kpp' => trim((string) ($row->kpp ?? '')),
                 'ogrn' => trim((string) ($row->ogrn ?? '')),
                 'email' => trim((string) ($row->email ?? '')),
-                'contact_name' => trim((string) ($row->ceo ?? '')),
+                'contact_name' => trim((string) ($row->manager_name ?? '')),
+                'manager_name' => trim((string) ($row->manager_name ?? '')),
+                'manager_post' => trim((string) ($row->manager_post ?? '')),
                 'short_name' => trim((string) ($row->short_name ?? '')),
                 'full_name' => trim((string) ($row->full_name ?? '')),
                 'legal_address' => trim((string) ($row->legal_address ?? '')),
-                'actual_address' => trim((string) ($row->actual_address ?? '')),
                 'legal_postal_code' => trim((string) ($row->legal_postal_code ?? '')),
                 'legal_region' => trim((string) ($row->legal_region ?? '')),
                 'legal_city' => trim((string) ($row->legal_city ?? '')),
@@ -1588,6 +1597,7 @@ class OrderController extends Controller
         $phone = trim((string) (data_get($data, 'phones.0.value') ?? data_get($data, 'phones.0.data.value') ?? ''));
         $inn = trim((string) ($data['inn'] ?? ''));
         $addressAttributes = $this->extractLegalAddressAttributesFromDaDataParty($data);
+        $managerAttributes = $this->extractManagerAttributesFromDaDataParty($data);
 
         return [
             'source' => 'dadata',
@@ -1603,11 +1613,10 @@ class OrderController extends Controller
                 'kpp' => trim((string) ($data['kpp'] ?? '')),
                 'ogrn' => trim((string) (($data['ogrn'] ?? $data['ogrnip'] ?? ''))),
                 'email' => '',
-                'contact_name' => '',
-                'actual_address' => '',
+                'contact_name' => trim((string) ($managerAttributes['manager_name'] ?? '')),
                 'type_kind' => $typeKind,
                 'source' => 'dadata',
-            ], $addressAttributes),
+            ], $addressAttributes, $managerAttributes),
         ];
     }
 
@@ -1616,7 +1625,7 @@ class OrderController extends Controller
         $row = DB::table('counterparties as cp')
             ->leftJoin('customers as c', 'c.counterparty_id', '=', 'cp.id')
             ->leftJoin('counterparties_type as cpt', 'cpt.id', '=', 'cp.type')
-            ->select('cp.id', 'c.id as customer_id', 'cp.short_name', 'cp.full_name', 'cp.inn', 'cp.kpp', 'cp.ogrn', 'cp.phone', 'cp.email', 'cp.ceo', 'cp.legal_address', 'cp.actual_address', 'cp.legal_postal_code', 'cp.legal_region', 'cp.legal_city', 'cp.legal_settlement', 'cp.legal_street', 'cp.legal_house', 'cp.legal_block', 'cp.legal_flat', 'cp.legal_fias_id', 'cp.legal_kladr_id', 'cp.legal_geo_lat', 'cp.legal_geo_lon', 'cp.legal_qc', 'cp.legal_qc_geo', 'cp.legal_address_invalid', 'cp.legal_address_data', 'cpt.name as type_name')
+            ->select('cp.id', 'c.id as customer_id', 'cp.short_name', 'cp.full_name', 'cp.inn', 'cp.kpp', 'cp.ogrn', 'cp.phone', 'cp.email', 'cp.manager_name', 'cp.manager_post', 'cp.legal_address', 'cp.legal_postal_code', 'cp.legal_region', 'cp.legal_city', 'cp.legal_settlement', 'cp.legal_street', 'cp.legal_house', 'cp.legal_block', 'cp.legal_flat', 'cp.legal_fias_id', 'cp.legal_kladr_id', 'cp.legal_geo_lat', 'cp.legal_geo_lon', 'cp.legal_qc', 'cp.legal_qc_geo', 'cp.legal_address_invalid', 'cp.legal_address_data', 'cpt.name as type_name')
             ->where('cp.id', $counterpartyId)
             ->first();
 
@@ -1634,8 +1643,9 @@ class OrderController extends Controller
                 'contact_name' => '',
                 'short_name' => '',
                 'full_name' => '',
+                'manager_name' => '',
+                'manager_post' => '',
                 'legal_address' => '',
-                'actual_address' => '',
                 'type_kind' => 'legal',
                 'source' => 'local',
             ];
@@ -1655,11 +1665,12 @@ class OrderController extends Controller
             'kpp' => trim((string) ($row->kpp ?? '')),
             'ogrn' => trim((string) ($row->ogrn ?? '')),
             'email' => trim((string) ($row->email ?? '')),
-            'contact_name' => trim((string) ($row->ceo ?? '')),
+            'contact_name' => trim((string) ($row->manager_name ?? '')),
             'short_name' => trim((string) ($row->short_name ?? '')),
             'full_name' => trim((string) ($row->full_name ?? '')),
+            'manager_name' => trim((string) ($row->manager_name ?? '')),
+            'manager_post' => trim((string) ($row->manager_post ?? '')),
             'legal_address' => trim((string) ($row->legal_address ?? '')),
-            'actual_address' => trim((string) ($row->actual_address ?? '')),
             'legal_postal_code' => trim((string) ($row->legal_postal_code ?? '')),
             'legal_region' => trim((string) ($row->legal_region ?? '')),
             'legal_city' => trim((string) ($row->legal_city ?? '')),
@@ -1692,7 +1703,8 @@ class OrderController extends Controller
         $shortName = trim((string) ($payload['short_name'] ?? ''));
         $fullName = trim((string) ($payload['full_name'] ?? ''));
         $legalAddress = trim((string) ($payload['legal_address'] ?? ''));
-        $actualAddress = trim((string) ($payload['actual_address'] ?? ''));
+        $managerName = trim((string) ($payload['manager_name'] ?? ''));
+        $managerPost = trim((string) ($payload['manager_post'] ?? ''));
         $ogrn = trim((string) ($payload['ogrn'] ?? ''));
         $typeId = $this->resolveCounterpartyTypeIdByKind((string) ($payload['type_kind'] ?? 'legal'));
 
@@ -1732,8 +1744,8 @@ class OrderController extends Controller
             'kpp' => $kpp !== '' ? $kpp : null,
             'ogrn' => $ogrn !== '' ? $ogrn : null,
             'legal_address' => $legalAddress !== '' ? $legalAddress : null,
-            'actual_address' => $actualAddress !== '' ? $actualAddress : null,
-            'ceo' => $fullName !== '' ? $fullName : ($shortName !== '' ? $shortName : $fallbackName),
+            'manager_name' => $managerName !== '' ? $managerName : null,
+            'manager_post' => $managerPost !== '' ? $managerPost : null,
             'phone' => $phone !== '' ? $phone : '—',
             'email' => null,
             'notes' => null,
@@ -1820,6 +1832,18 @@ class OrderController extends Controller
             'legal_qc_geo' => $this->nullableInt(data_get($addressData, 'qc_geo')),
             'legal_address_invalid' => $hasAddress ? $addressInvalidity !== null : null,
             'legal_address_data' => $addressData !== [] ? $addressData : null,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array{manager_name: ?string, manager_post: ?string}
+     */
+    private function extractManagerAttributesFromDaDataParty(array $data): array
+    {
+        return [
+            'manager_name' => $this->nullableString(data_get($data, 'management.name')),
+            'manager_post' => $this->nullableString(data_get($data, 'management.post')),
         ];
     }
 

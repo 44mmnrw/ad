@@ -79,7 +79,7 @@
                             $counterpartyName = $counterparty->short_name ?: $counterparty->full_name ?: 'Без названия';
                             $typeName = $counterparty->typeRef?->name ?? '—';
                             $isPersonType = str_contains(mb_strtolower($typeName), 'физ') || str_contains(mb_strtolower($typeName), 'самозан');
-                            $cityText = $counterparty->actual_address ?: $counterparty->legal_address ?: '—';
+                            $cityText = $counterparty->legal_city ?: $counterparty->legal_settlement ?: $counterparty->legal_address ?: '—';
                         @endphp
                         <tr class="cp-row-clickable" role="link" tabindex="0" aria-label="Открыть карточку контрагента {{ $counterpartyName }}" data-href="{{ route('counterparties.show', $counterparty) }}" onclick="window.location=this.dataset.href" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.location=this.dataset.href; }">
                             <td>

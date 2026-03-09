@@ -34,8 +34,8 @@ class CounterpartySuggestSearchTest extends TestCase
             'kpp' => '770101001',
             'ogrn' => '1027700132195',
             'legal_address' => 'Москва, ул. Ленина, 1',
-            'actual_address' => 'Москва, ул. Ленина, 1',
-            'ceo' => 'Иванов Иван Иванович',
+            'manager_name' => 'Иванов Иван Иванович',
+            'manager_post' => 'Генеральный директор',
             'phone' => '+7 (999) 111-22-33',
             'email' => 'info@romashka.test',
             'notes' => null,
@@ -63,6 +63,17 @@ class CounterpartySuggestSearchTest extends TestCase
                                     'value' => '+7 999 555-44-33',
                                 ],
                             ],
+                            'managers' => [
+                                [
+                                    'fio' => [
+                                        'surname' => 'Петров',
+                                        'name' => 'Андрей',
+                                        'patronymic' => 'Иванович',
+                                        'source' => 'ПЕТРОВ АНДРЕЙ ИВАНОВИЧ',
+                                    ],
+                                    'post' => 'ГЕНЕРАЛЬНЫЙ ДИРЕКТОР',
+                                ],
+                            ],
                         ],
                     ],
                 ],
@@ -88,6 +99,8 @@ class CounterpartySuggestSearchTest extends TestCase
             'ogrn' => '1147746123456',
             'phone' => '+7 999 555-44-33',
             'legal_address' => 'Москва, Ленинградский проспект, 10',
+            'manager_name' => 'ПЕТРОВ АНДРЕЙ ИВАНОВИЧ',
+            'manager_post' => 'ГЕНЕРАЛЬНЫЙ ДИРЕКТОР',
             'legal_address_invalid' => '0',
         ]));
     }
@@ -108,7 +121,8 @@ class CounterpartySuggestSearchTest extends TestCase
             'ogrn' => '1237800001112',
             'phone' => '+7 (812) 000-00-00',
             'legal_address' => 'Санкт-Петербург, Невский проспект, 1',
-            'actual_address' => 'Санкт-Петербург, Невский проспект, 1',
+            'manager_name' => 'Петров Пётр Петрович',
+            'manager_post' => 'Генеральный директор',
         ]));
 
         $response->assertOk();

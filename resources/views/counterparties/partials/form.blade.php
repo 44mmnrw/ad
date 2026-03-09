@@ -76,17 +76,21 @@
                 <span>Email</span>
                 <input type="email" name="email" value="{{ old('email', $counterparty->email) }}" placeholder="email@example.com">
             </label>
+            <label class="cp-inline-form__field cp-inline-form__field--icon" data-type-visible-kinds="legal,entrepreneur">
+                <span>Руководитель / ответственное лицо</span>
+                <input type="text" name="manager_name" value="{{ old('manager_name', $counterparty->manager_name) }}" placeholder="Иванов Иван Иванович">
+            </label>
+            <label class="cp-inline-form__field cp-inline-form__field--icon" data-type-visible-kinds="legal,entrepreneur">
+                <span>Должность</span>
+                <input type="text" name="manager_post" value="{{ old('manager_post', $counterparty->manager_post) }}" placeholder="Генеральный директор">
+            </label>
         </div>
     </div>
 
     <div class="cp-inline-section">
         <h2>Адрес</h2>
         <div class="cp-inline-form__grid">
-            <label class="cp-inline-form__field cp-inline-form__field--icon">
-                <span>Город <em>*</em></span>
-                <input type="text" name="actual_address" value="{{ old('actual_address', $counterparty->actual_address) }}" placeholder="Москва" required>
-            </label>
-            <label class="cp-inline-form__field">
+            <label class="cp-inline-form__field cp-inline-form__field--full">
                 <span>Юридический адрес <em>*</em></span>
                 <input type="text" name="legal_address" value="{{ old('legal_address', $counterparty->legal_address) }}" placeholder="ул. Ленина, 12" required>
             </label>
@@ -148,6 +152,8 @@
             ['ogrn', 'ogrn', false],
             ['kpp', 'kpp', false],
             ['phone', 'phone', false],
+            ['manager_name', 'manager_name', true],
+            ['manager_post', 'manager_post', true],
             ['legal_address', 'legal_address', false],
             ['legal_postal_code', 'legal_postal_code', true],
             ['legal_region', 'legal_region', true],
@@ -303,6 +309,8 @@
                 setFieldValue('kpp', data.kpp);
                 setFieldValue('legal_address', data.legal_address);
                 setFieldValue('phone', data.phone);
+                setFieldValue('manager_name', data.manager_name, { clearWhenEmpty: true });
+                setFieldValue('manager_post', data.manager_post, { clearWhenEmpty: true });
                 setFieldValue('legal_postal_code', data.legal_postal_code, { clearWhenEmpty: true });
                 setFieldValue('legal_region', data.legal_region, { clearWhenEmpty: true });
                 setFieldValue('legal_city', data.legal_city, { clearWhenEmpty: true });

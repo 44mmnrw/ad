@@ -33,6 +33,10 @@
             <div class="settings-page__hint settings-page__hint--stack" role="status">
                 <strong>Результат теста:</strong>
                 <span>{{ session('dadata_test_result') }}</span>
+                @if (session('dadata_test_mode'))
+                    <span>Режим: <strong>{{ session('dadata_test_mode') }}</strong></span>
+                @endif
+                <span>Подсказка: в JSON ищите <code>suggestions[].data.management</code> — там поля <code>name</code> и <code>post</code>.</span>
                 @if (session('dadata_test_payload'))
                     <pre class="settings-page__json">{{ session('dadata_test_payload') }}</pre>
                 @endif
@@ -110,11 +114,19 @@
             <form action="{{ route('settings.dadata.test') }}" method="post" class="settings-form settings-form--inline">
                 @csrf
                 <label class="settings-form__field settings-form__field--grow">
-                    <span>Тестовый ИНН</span>
-                    <input type="text" name="test_query" value="{{ old('test_query') }}" placeholder="Например: 7707083893" required>
+                    <span>Тестовый запрос (ИНН/ОГРН или название)</span>
+                    <input type="text" name="test_query" value="{{ old('test_query') }}" placeholder='Например: 7707083893 или "Газпром"' required>
+                </label>
+                <label class="settings-form__field settings-form__field--sm">
+                    <span>Режим</span>
+                    <select name="test_mode">
+                        <option value="auto" @selected(old('test_mode', 'auto') === 'auto')>Авто</option>
+                        <option value="inn" @selected(old('test_mode') === 'inn')>ИНН/ОГРН</option>
+                        <option value="name" @selected(old('test_mode') === 'name')>Название</option>
+                    </select>
                 </label>
                 <div class="settings-form__actions">
-                    <button type="submit" class="ad-btn">Проверить подключение</button>
+                    <button type="submit" class="ad-btn">Проверить и показать полный JSON</button>
                 </div>
             </form>
         </section>

@@ -121,8 +121,8 @@ class CounterpartyController extends Controller
             'kpp' => $validated['kpp'] ?: null,
             'ogrn' => $validated['ogrn'] ?: null,
             'legal_address' => $validated['legal_address'] ?: null,
-            'actual_address' => $validated['actual_address'] ?: null,
-            'ceo' => $validated['full_name'] ?: $validated['short_name'] ?: null,
+            'manager_name' => $validated['manager_name'] ?: null,
+            'manager_post' => $validated['manager_post'] ?: null,
             'phone' => $validated['phone'],
             'email' => $validated['email'] ?: null,
             'notes' => $validated['notes'] ?: null,
@@ -369,8 +369,8 @@ class CounterpartyController extends Controller
             'kpp' => $validated['kpp'] ?: null,
             'ogrn' => $validated['ogrn'] ?: null,
             'legal_address' => $validated['legal_address'] ?: null,
-            'actual_address' => $validated['actual_address'] ?: null,
-            'ceo' => $validated['full_name'] ?: $validated['short_name'] ?: null,
+            'manager_name' => $validated['manager_name'] ?: null,
+            'manager_post' => $validated['manager_post'] ?: null,
             'phone' => $validated['phone'],
             'email' => $validated['email'] ?: null,
             'notes' => $validated['notes'] ?: null,
@@ -397,7 +397,8 @@ class CounterpartyController extends Controller
                     ->orWhere('inn', 'like', "%{$search}%")
                     ->orWhere('phone', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('actual_address', 'like', "%{$search}%")
+                    ->orWhere('manager_name', 'like', "%{$search}%")
+                    ->orWhere('manager_post', 'like', "%{$search}%")
                     ->orWhere('legal_address', 'like', "%{$search}%");
             });
         }
@@ -523,6 +524,7 @@ class CounterpartyController extends Controller
                 ?? ''
             ));
             $addressAttributes = $this->extractLegalAddressAttributesFromDaDataParty($data);
+            $managerAttributes = $this->extractManagerAttributesFromDaDataParty($data);
 
             return response()->json([
                 'message' => 'Данные по ИНН/ОГРН успешно загружены.',
@@ -534,8 +536,7 @@ class CounterpartyController extends Controller
                     'kpp' => (string) ($data['kpp'] ?? ''),
                     'ogrn' => (string) (($data['ogrn'] ?? $data['ogrnip'] ?? '')),
                     'phone' => $phone !== '' ? $phone : null,
-                    'actual_address' => null,
-                ], $addressAttributes),
+                ], $addressAttributes, $managerAttributes),
             ]);
         } catch (Throwable $exception) {
             return response()->json([
@@ -613,7 +614,8 @@ class CounterpartyController extends Controller
             'kpp' => ['nullable', 'string', 'max:9'],
             'ogrn' => ['nullable', 'string', 'max:15'],
             'legal_address' => ['nullable', 'string', 'max:1000'],
-            'actual_address' => ['nullable', 'string', 'max:1000'],
+            'manager_name' => ['nullable', 'string', 'max:255'],
+            'manager_post' => ['nullable', 'string', 'max:255'],
             'legal_postal_code' => ['nullable', 'string', 'max:10'],
             'legal_region' => ['nullable', 'string', 'max:150'],
             'legal_city' => ['nullable', 'string', 'max:150'],
@@ -677,7 +679,8 @@ class CounterpartyController extends Controller
                     ->orWhere('inn', 'like', "%{$query}%")
                     ->orWhere('phone', 'like', "%{$query}%")
                     ->orWhere('email', 'like', "%{$query}%")
-                    ->orWhere('actual_address', 'like', "%{$query}%")
+                    ->orWhere('manager_name', 'like', "%{$query}%")
+                    ->orWhere('manager_post', 'like', "%{$query}%")
                     ->orWhere('legal_address', 'like', "%{$query}%");
             })
             ->orderByDesc('created_at')
@@ -700,8 +703,9 @@ class CounterpartyController extends Controller
                         'inn' => $inn,
                         'short_name' => trim((string) ($counterparty->short_name ?? '')),
                         'full_name' => trim((string) ($counterparty->full_name ?? '')),
+                        'manager_name' => trim((string) ($counterparty->manager_name ?? '')),
+                        'manager_post' => trim((string) ($counterparty->manager_post ?? '')),
                         'legal_address' => trim((string) ($counterparty->legal_address ?? '')),
-                        'actual_address' => trim((string) ($counterparty->actual_address ?? '')),
                         'type_kind' => $this->resolveTypeKindById((int) $counterparty->type),
                     ],
                 ];
@@ -728,6 +732,7 @@ class CounterpartyController extends Controller
         $phone = trim((string) (data_get($data, 'phones.0.value') ?? data_get($data, 'phones.0.data.value') ?? ''));
         $inn = trim((string) ($data['inn'] ?? ''));
         $addressAttributes = $this->extractLegalAddressAttributesFromDaDataParty($data);
+        $managerAttributes = $this->extractManagerAttributesFromDaDataParty($data);
 
         $query = [
             'prefill' => 1,
@@ -740,7 +745,7 @@ class CounterpartyController extends Controller
             'phone' => $phone,
         ];
 
-        $query = array_merge($query, $this->buildLegalAddressQueryParameters($addressAttributes));
+        $query = array_merge($query, $this->buildLegalAddressQueryParameters($addressAttributes), $this->buildLegalAddressQueryParameters($managerAttributes));
 
         return [
             'source' => 'dadata',
@@ -755,9 +760,8 @@ class CounterpartyController extends Controller
                 'full_name' => $fullName,
                 'kpp' => trim((string) ($data['kpp'] ?? '')),
                 'ogrn' => trim((string) (($data['ogrn'] ?? $data['ogrnip'] ?? ''))),
-                'actual_address' => '',
                 'type_kind' => $typeKind,
-            ], $addressAttributes),
+            ], $addressAttributes, $managerAttributes),
         ];
     }
 
@@ -818,7 +822,8 @@ class CounterpartyController extends Controller
         $counterparty->ogrn = $this->normalizeQueryValue($request->query('ogrn'));
         $counterparty->phone = $this->normalizeQueryValue($request->query('phone'));
         $counterparty->legal_address = $this->normalizeQueryValue($request->query('legal_address'));
-        $counterparty->actual_address = $this->normalizeQueryValue($request->query('actual_address'));
+        $counterparty->manager_name = $this->normalizeQueryValue($request->query('manager_name'));
+        $counterparty->manager_post = $this->normalizeQueryValue($request->query('manager_post'));
         $counterparty->legal_postal_code = $this->normalizeQueryValue($request->query('legal_postal_code'));
         $counterparty->legal_region = $this->normalizeQueryValue($request->query('legal_region'));
         $counterparty->legal_city = $this->normalizeQueryValue($request->query('legal_city'));
@@ -875,6 +880,18 @@ class CounterpartyController extends Controller
             'legal_qc_geo' => $this->nullableInt(data_get($addressData, 'qc_geo')),
             'legal_address_invalid' => $hasAddress ? $addressInvalidity !== null : null,
             'legal_address_data' => $addressData !== [] ? $addressData : null,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array{manager_name: ?string, manager_post: ?string}
+     */
+    private function extractManagerAttributesFromDaDataParty(array $data): array
+    {
+        return [
+            'manager_name' => $this->nullableString(data_get($data, 'management.name')),
+            'manager_post' => $this->nullableString(data_get($data, 'management.post')),
         ];
     }
 
