@@ -29,6 +29,9 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/counterparties', [CounterpartyController::class, 'index'])
         ->middleware('permission:counterparties.view')
         ->name('counterparties.index');
+    Route::get('/counterparties/search/suggest', [CounterpartyController::class, 'suggest'])
+        ->middleware('permission:counterparties.view')
+        ->name('counterparties.search.suggest');
 
     Route::get('/counterparties/create', [CounterpartyController::class, 'create'])
         ->middleware('permission:counterparties.manage')
@@ -64,10 +67,15 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/orders/route/address-suggest', [OrderController::class, 'suggestRouteAddresses'])
         ->middleware('permission:orders.manage')
         ->name('orders.route.address_suggest');
-    Route::get('/orders/{order}', [OrderController::class, 'show'])
-        ->middleware('permission:orders.view')
-        ->name('orders.show');
-
+    Route::get('/orders/participants/counterparties/search', [OrderController::class, 'searchParticipantCounterparties'])
+        ->middleware('permission:orders.manage')
+        ->name('orders.participants.counterparties.search');
+    Route::post('/orders/customer/dadata/autofill', [OrderController::class, 'autofillCustomerByInn'])
+        ->middleware('permission:orders.manage')
+        ->name('orders.customer.dadata.autofill');
+    Route::post('/orders/participants/counterparties/resolve', [OrderController::class, 'resolveParticipantCounterparty'])
+        ->middleware('permission:orders.manage')
+        ->name('orders.participants.counterparties.resolve');
     Route::get('/orders/create', [OrderController::class, 'create'])
         ->middleware('permission:orders.manage')
         ->name('orders.create');
@@ -80,6 +88,9 @@ Route::middleware('auth')->group(function (): void {
     Route::put('/orders/{order}', [OrderController::class, 'update'])
         ->middleware('permission:orders.manage')
         ->name('orders.update');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])
+        ->middleware('permission:orders.view')
+        ->name('orders.show');
 
     Route::get('/settings/integrations/dadata', [IntegrationSettingsController::class, 'editDadata'])
         ->middleware('permission:settings.integrations.manage')

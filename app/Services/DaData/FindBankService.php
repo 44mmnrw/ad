@@ -33,8 +33,8 @@ class FindBankService
             'count' => $options['count'] ?? null,
         ], static fn (mixed $value): bool => $value !== null && $value !== '');
 
-        $apiKey = (string) IntegrationSetting::getValue(self::INTEGRATION, 'api_key', config('services.dadata.api_key'));
-        $secretKey = (string) IntegrationSetting::getValue(self::INTEGRATION, 'secret_key', config('services.dadata.secret_key'));
+        $apiKey = trim((string) IntegrationSetting::getValue(self::INTEGRATION, 'api_key', ''));
+        $secretKey = trim((string) IntegrationSetting::getValue(self::INTEGRATION, 'secret_key', ''));
         $timeout = $this->resolveTimeout();
         $url = (string) config('services.dadata.find_bank_url');
 

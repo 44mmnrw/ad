@@ -221,6 +221,15 @@
     grid-column: 1 / -1;
 }
 
+.cp-create-search {
+    position: relative;
+}
+
+.cp-search-suggest--form {
+    position: static;
+    margin-top: 0.125rem;
+}
+
 .cp-inline-form__field span {
     color: var(--ad-slate-900);
     font-size: 0.875rem;

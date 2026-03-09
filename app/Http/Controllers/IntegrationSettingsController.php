@@ -16,8 +16,8 @@ class IntegrationSettingsController extends Controller
     {
         return view('settings.dadata', [
             'activeMenu' => 'settings',
-            'apiKey' => (string) IntegrationSetting::getValue('dadata', 'api_key', config('services.dadata.api_key')),
-            'secretKey' => (string) IntegrationSetting::getValue('dadata', 'secret_key', config('services.dadata.secret_key')),
+            'apiKey' => (string) IntegrationSetting::getValue('dadata', 'api_key', ''),
+            'secretKey' => (string) IntegrationSetting::getValue('dadata', 'secret_key', ''),
             'yandexStaticApiKey' => $this->resolveYandexMapsSetting(['static_api_key']) ?? '',
             'yandexJsApiKey' => $this->resolveYandexMapsSetting(['js_api_key', 'js_http_geocoder_api_key']) ?? '',
             'yandexHttpGeocoderApiKey' => $this->resolveYandexMapsSetting(['http_geocoder_api_key', 'geocoder_api_key', 'js_http_geocoder_api_key', 'static_api_key']) ?? '',
@@ -109,7 +109,7 @@ class IntegrationSettingsController extends Controller
     private function resolveYandexMapsSetting(array $keys): ?string
     {
         foreach ($keys as $key) {
-            $value = trim((string) IntegrationSetting::getValue('yandex_maps', $key, config("services.yandex_maps.{$key}")));
+            $value = trim((string) IntegrationSetting::getValue('yandex_maps', $key, ''));
 
             if ($value !== '') {
                 return $value;

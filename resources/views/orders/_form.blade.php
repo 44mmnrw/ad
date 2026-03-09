@@ -10,13 +10,22 @@
     $dateValue = $order['created_at'] ?? now()->format('d.m.Y');
 
     $carrierName = $order['carrier']['name'] ?? null;
+    $carrierPhone = $order['carrier']['phone'] ?? null;
+    $carrierCounterpartyId = isset($order['carrier']['counterparty_id']) ? (int) $order['carrier']['counterparty_id'] : null;
     $driverName = $order['driver']['name'] ?? null;
+    $driverPhone = $order['driver']['phone'] ?? null;
+    $driverTransport = $order['driver']['car'] ?? null;
+    $driverPlate = $order['driver']['plate'] ?? null;
     $senderName = $order['sender']['name'] ?? null;
+    $senderPhone = $order['sender']['phone'] ?? null;
     $receiverName = $order['receiver']['name'] ?? null;
+    $receiverPhone = $order['receiver']['phone'] ?? null;
     $fromLat = $order['route']['from']['lat'] ?? null;
     $fromLng = $order['route']['from']['lng'] ?? null;
     $toLat = $order['route']['to']['lat'] ?? null;
     $toLng = $order['route']['to']['lng'] ?? null;
+    $fromCounterpartyId = isset($order['route']['from']['counterparty_id']) ? (int) $order['route']['from']['counterparty_id'] : null;
+    $toCounterpartyId = isset($order['route']['to']['counterparty_id']) ? (int) $order['route']['to']['counterparty_id'] : null;
     $counterpartyOptions = is_iterable($counterparties ?? null) ? $counterparties : [];
     $intermediateStops = collect($order['route']['intermediate'] ?? [])
         ->filter(static fn ($stop) => is_array($stop))
@@ -31,17 +40,72 @@
         ->values()
         ->all();
 
+    if (! filled($driverPlate) && filled($driverTransport) && str_contains((string) $driverTransport, ',')) {
+        [$driverTransportParsed, $driverPlateParsed] = array_map(
+            static fn ($value) => trim((string) $value),
+            explode(',', (string) $driverTransport, 2)
+        );
+
+        $driverTransport = $driverTransportParsed;
+        $driverPlate = $driverPlateParsed;
+    }
+
+    $hasParticipantValue = static fn ($value) => filled($value)
+        && trim((string) $value) !== '—'
+        && trim((string) $value) !== 'Не указан';
+
+    $carrierFilled = $hasParticipantValue($carrierName) || $hasParticipantValue($carrierPhone);
+    $driverFilled = $hasParticipantValue($driverName) || $hasParticipantValue($driverPhone) || $hasParticipantValue($driverTransport) || $hasParticipantValue($driverPlate);
+    $senderFilled = $hasParticipantValue($senderName) || $hasParticipantValue($senderPhone);
+    $receiverFilled = $hasParticipantValue($receiverName) || $hasParticipantValue($receiverPhone);
+
     $participantsFilled = collect([
-        $driverName,
-        $senderName,
-        $receiverName,
-    ])->filter(static fn ($value) => filled($value))->count();
+        $carrierFilled ? '1' : null,
+        $driverFilled ? '1' : null,
+        $senderFilled ? '1' : null,
+        $receiverFilled ? '1' : null,
+    ])->filter()->count();
+
+    $participantSearchRoute = route('orders.participants.counterparties.search');
+    $participantResolveRoute = route('orders.participants.counterparties.resolve');
+    $customerAutofillRoute = route('orders.customer.dadata.autofill');
+    $customer = is_array($order['customer'] ?? null) ? $order['customer'] : [];
+    $customerId = old('customer_id', $customer['id'] ?? '');
+    $customerCounterpartyId = old('customer_counterparty_id', $customer['counterparty_id'] ?? '');
+    $customerContactId = old('customer_contact_id', $customer['contact_id'] ?? '');
+    $customerName = old('customer_name', $customer['name'] ?? '');
+    $customerContactName = old('customer_contact_name', $customer['contact_name'] ?? '');
+    $customerPhone = old('customer_phone', $customer['phone'] ?? '');
+    $customerEmail = old('customer_email', $customer['email'] ?? '');
+    $customerInn = old('customer_inn', $customer['inn'] ?? '');
+    $customerLegalAddress = old('customer_legal_address', $customer['legal_address'] ?? '');
+    $customerLegalPostalCode = old('customer_legal_postal_code', $customer['legal_postal_code'] ?? '');
+    $customerLegalRegion = old('customer_legal_region', $customer['legal_region'] ?? '');
+    $customerLegalCity = old('customer_legal_city', $customer['legal_city'] ?? '');
+    $customerLegalSettlement = old('customer_legal_settlement', $customer['legal_settlement'] ?? '');
+    $customerLegalStreet = old('customer_legal_street', $customer['legal_street'] ?? '');
+    $customerLegalHouse = old('customer_legal_house', $customer['legal_house'] ?? '');
+    $customerLegalBlock = old('customer_legal_block', $customer['legal_block'] ?? '');
+    $customerLegalFlat = old('customer_legal_flat', $customer['legal_flat'] ?? '');
+    $customerLegalFiasId = old('customer_legal_fias_id', $customer['legal_fias_id'] ?? '');
+    $customerLegalKladrId = old('customer_legal_kladr_id', $customer['legal_kladr_id'] ?? '');
+    $customerLegalGeoLat = old('customer_legal_geo_lat', $customer['legal_geo_lat'] ?? '');
+    $customerLegalGeoLon = old('customer_legal_geo_lon', $customer['legal_geo_lon'] ?? '');
+    $customerLegalQc = old('customer_legal_qc', $customer['legal_qc'] ?? '');
+    $customerLegalQcGeo = old('customer_legal_qc_geo', $customer['legal_qc_geo'] ?? '');
+    $customerLegalAddressInvalid = old('customer_legal_address_invalid', array_key_exists('legal_address_invalid', $customer) ? ($customer['legal_address_invalid'] === null ? '' : ($customer['legal_address_invalid'] ? '1' : '0')) : '');
+    $customerLegalAddressData = old('customer_legal_address_data', is_array($customer['legal_address_data'] ?? null)
+        ? json_encode($customer['legal_address_data'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+        : ($customer['legal_address_data'] ?? ''));
 @endphp
 
 <form
     class="order-edit"
     action="{{ $isEdit ? route('orders.update', $order['id'] ?? 1) : route('orders.store') }}"
     method="post"
+    data-participant-search-url="{{ $participantSearchRoute }}"
+    data-participant-resolve-url="{{ $participantResolveRoute }}"
+    data-customer-autofill-url="{{ $customerAutofillRoute }}"
 >
     @csrf
     @if ($isEdit)
@@ -62,14 +126,18 @@
 
             <section class="order-edit-card order-edit-form-card">
                 <nav class="order-edit-tabs" aria-label="Разделы заявки">
+                    <button type="button" class="ad-btn is-active" data-order-tab="customer" aria-controls="order-tab-panel-customer" aria-selected="true">
+                        <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-briefcase"></use></svg>
+                        <span>Заказчик</span>
+                    </button>
                     <button type="button" class="ad-btn" data-order-tab="route" aria-controls="order-tab-panel-route" aria-selected="false">
                         <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-trips"></use></svg>
                         <span>Маршрут</span>
                     </button>
-                    <button type="button" class="ad-btn is-active" data-order-tab="participants" aria-controls="order-tab-panel-participants" aria-selected="true">
+                    <button type="button" class="ad-btn" data-order-tab="participants" aria-controls="order-tab-panel-participants" aria-selected="false">
                         <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-man"></use></svg>
                         <span>Участники</span>
-                        <em>{{ $participantsFilled }}/4</em>
+                        <em data-participants-progress>{{ $participantsFilled }}/4</em>
                     </button>
                     <button type="button" class="ad-btn" data-order-tab="cargo" aria-controls="order-tab-panel-cargo" aria-selected="false">
                         <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-package"></use></svg>
@@ -82,11 +150,117 @@
                 </nav>
 
                 <div class="order-edit-tab-panels">
+                    <div id="order-tab-panel-customer" class="order-edit-tab-panel" data-order-tab-panel="customer">
+                        <div class="order-edit-fields">
+                            <section class="order-edit-group">
+                                <h2>Информация о заказчике</h2>
+
+                                <input type="hidden" name="customer_id" value="{{ $customerId }}">
+                                <input type="hidden" name="customer_counterparty_id" value="{{ $customerCounterpartyId }}">
+                                <input type="hidden" name="customer_contact_id" value="{{ $customerContactId }}">
+                                <input type="hidden" name="customer_legal_address" value="{{ $customerLegalAddress }}">
+                                <input type="hidden" name="customer_legal_postal_code" value="{{ $customerLegalPostalCode }}">
+                                <input type="hidden" name="customer_legal_region" value="{{ $customerLegalRegion }}">
+                                <input type="hidden" name="customer_legal_city" value="{{ $customerLegalCity }}">
+                                <input type="hidden" name="customer_legal_settlement" value="{{ $customerLegalSettlement }}">
+                                <input type="hidden" name="customer_legal_street" value="{{ $customerLegalStreet }}">
+                                <input type="hidden" name="customer_legal_house" value="{{ $customerLegalHouse }}">
+                                <input type="hidden" name="customer_legal_block" value="{{ $customerLegalBlock }}">
+                                <input type="hidden" name="customer_legal_flat" value="{{ $customerLegalFlat }}">
+                                <input type="hidden" name="customer_legal_fias_id" value="{{ $customerLegalFiasId }}">
+                                <input type="hidden" name="customer_legal_kladr_id" value="{{ $customerLegalKladrId }}">
+                                <input type="hidden" name="customer_legal_geo_lat" value="{{ $customerLegalGeoLat }}">
+                                <input type="hidden" name="customer_legal_geo_lon" value="{{ $customerLegalGeoLon }}">
+                                <input type="hidden" name="customer_legal_qc" value="{{ $customerLegalQc }}">
+                                <input type="hidden" name="customer_legal_qc_geo" value="{{ $customerLegalQcGeo }}">
+                                <input type="hidden" name="customer_legal_address_invalid" value="{{ $customerLegalAddressInvalid }}">
+                                <input type="hidden" name="customer_legal_address_data" value="{{ $customerLegalAddressData }}">
+
+                                <div class="order-edit-grid">
+                                    <label class="order-participant-lookup order-customer-lookup" data-customer-lookup>
+                                        <span>Название организации / ФИО <em>*</em></span>
+                                        <div class="order-participant-lookup__control">
+                                            <div class="order-edit-input order-edit-input--icon">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-briefcase"></use></svg>
+                                                <input type="text" name="customer_name" value="{{ $customerName }}" placeholder='ООО &quot;Логистические решения&quot;' data-customer-search-input autocomplete="organization" required>
+                                            </div>
+                                            <button type="button" class="ad-btn" data-customer-autofill>Заполнить по DaData</button>
+                                            <button type="button" class="ad-btn" data-customer-clear>Очистить</button>
+                                        </div>
+                                        <p class="order-participant-lookup__status" data-customer-search-status hidden></p>
+                                        <div class="order-participant-lookup__results" data-customer-search-results hidden></div>
+                                    </label>
+
+                                    <div class="order-edit-grid order-edit-grid--two">
+                                        <label>
+                                            <span>Контактное лицо</span>
+                                            <div class="order-edit-input order-edit-input--icon">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-man"></use></svg>
+                                                <input type="text" name="customer_contact_name" value="{{ $customerContactName }}" placeholder="Смирнов Алексей Петрович" autocomplete="name">
+                                            </div>
+                                        </label>
+                                        <label>
+                                            <span>Телефон <em>*</em></span>
+                                            <div class="order-edit-input order-edit-input--icon">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg>
+                                                <input type="text" name="customer_phone" value="{{ $customerPhone }}" placeholder="+7 (495) 123-45-67" autocomplete="tel" required>
+                                            </div>
+                                        </label>
+                                        <label>
+                                            <span>Email</span>
+                                            <div class="order-edit-input order-edit-input--icon">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-auth-mail"></use></svg>
+                                                <input type="email" name="customer_email" value="{{ $customerEmail }}" placeholder="info@company.ru" autocomplete="email">
+                                            </div>
+                                        </label>
+                                        <label>
+                                            <span>ИНН</span>
+                                            <div class="order-edit-input order-edit-input--icon">
+                                                <span class="order-edit-input__prefix order-edit-input__prefix--hash" aria-hidden="true">#</span>
+                                                <input type="text" name="customer_inn" value="{{ $customerInn }}" placeholder="7712345678" inputmode="numeric" autocomplete="off">
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="order-edit-note-card" aria-label="Подсказка по заказчику">
+                                <div class="order-edit-note-card__icon" aria-hidden="true">
+                                    <svg><use href="/icons/sprite.svg#icon-doc-briefcase"></use></svg>
+                                </div>
+                                <div class="order-edit-note-card__body">
+                                    <p class="order-edit-note-card__title">Информация о заказчике</p>
+                                    <p class="order-edit-note-card__text">Укажите организацию или физическое лицо, которое является инициатором перевозки и выступает заказчиком услуги. Эти данные будут использованы в документах.</p>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+
                     <div id="order-tab-panel-route" class="order-edit-tab-panel" data-order-tab-panel="route" hidden>
                         <div class="order-edit-fields">
                             <section class="order-edit-group">
                                 <h2>Откуда</h2>
                                 <div class="order-edit-grid order-edit-grid--two">
+                                    <label>
+                                        <span>Грузоотправитель</span>
+                                        <div class="order-edit-input">
+                                            <select name="from_counterparty_id" data-custom-select data-sync-participant-role="sender">
+                                                <option value="">По умолчанию: Заказчик</option>
+                                                @foreach ($counterpartyOptions as $cp)
+                                                    <option
+                                                        value="{{ $cp['id'] }}"
+                                                        data-counterparty-name="{{ $cp['name'] }}"
+                                                        data-counterparty-phone="{{ $cp['phone'] ?: '—' }}"
+                                                        data-counterparty-inn="{{ $cp['inn'] }}"
+                                                        @selected((string) ($fromCounterpartyId ?? '') === (string) $cp['id'])
+                                                    >
+                                                        {{ $cp['label'] }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </label>
+                                    <div></div>
                                     <label>
                                         <span>Город <em>*</em></span>
                                         <div class="order-edit-input order-edit-input--icon">
@@ -109,6 +283,26 @@
                             <section class="order-edit-group">
                                 <h2>Куда</h2>
                                 <div class="order-edit-grid order-edit-grid--two">
+                                    <label>
+                                        <span>Грузополучатель</span>
+                                        <div class="order-edit-input">
+                                            <select name="to_counterparty_id" data-custom-select data-sync-participant-role="receiver">
+                                                <option value="">По умолчанию: Заказчик</option>
+                                                @foreach ($counterpartyOptions as $cp)
+                                                    <option
+                                                        value="{{ $cp['id'] }}"
+                                                        data-counterparty-name="{{ $cp['name'] }}"
+                                                        data-counterparty-phone="{{ $cp['phone'] ?: '—' }}"
+                                                        data-counterparty-inn="{{ $cp['inn'] }}"
+                                                        @selected((string) ($toCounterpartyId ?? '') === (string) $cp['id'])
+                                                    >
+                                                        {{ $cp['label'] }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </label>
+                                    <div></div>
                                     <label>
                                         <span>Город <em>*</em></span>
                                         <div class="order-edit-input order-edit-input--icon">
@@ -276,7 +470,7 @@
                                         <span>Расстояние (км) <em>*</em></span>
                                         <div class="order-edit-input order-edit-input--icon">
                                             <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-driver-arrow"></use></svg>
-                                            <input type="text" name="distance" value="{{ $distanceValue }}" placeholder="480">
+                                            <input type="text" name="distance" value="{{ $distanceValue }}" placeholder="Рассчитывается автоматически" readonly data-route-distance-input>
                                         </div>
                                     </label>
                                     <label>
@@ -304,65 +498,193 @@
                         </div>
                     </div>
 
-                    <div id="order-tab-panel-participants" class="order-edit-tab-panel" data-order-tab-panel="participants">
+                    <div id="order-tab-panel-participants" class="order-edit-tab-panel" data-order-tab-panel="participants" hidden>
                         <div class="order-edit-participants-tab">
                             <h2 class="order-edit-participants-tab__title">Стороны перевозки</h2>
 
-                            <button type="button" class="order-participant-card order-participant-card--carrier" aria-label="Грузоперевозчик">
-                                <span class="order-participant-card__icon order-participant-card__icon--carrier" aria-hidden="true">
-                                    <svg><use href="/icons/sprite.svg#icon-doc-briefcase"></use></svg>
-                                </span>
-                                <span class="order-participant-card__content">
-                                    <span class="order-participant-card__name">Грузоперевозчик</span>
-                                    <span class="order-participant-card__meta">{{ $carrierName ?: 'Транспортная компания, выполняющая перевозку' }}</span>
-                                </span>
-                                <span class="order-participant-card__status order-participant-card__status--empty">Не указан</span>
-                                <span class="order-participant-card__arrow" aria-hidden="true">
-                                    <svg><use href="/icons/sprite.svg#icon-doc-left-arrow"></use></svg>
-                                </span>
-                            </button>
+                            <section class="order-participant-panel order-participant-panel--carrier is-open" data-participant-panel data-participant-role="carrier" data-participant-filled="{{ $carrierFilled ? '1' : '0' }}">
+                                <button type="button" class="order-participant-panel__toggle" data-participant-toggle aria-expanded="true" aria-controls="participant-panel-carrier-body">
+                                    <span class="order-participant-panel__icon order-participant-panel__icon--carrier" aria-hidden="true">
+                                        <svg><use href="/icons/sprite.svg#icon-doc-briefcase"></use></svg>
+                                    </span>
+                                    <span class="order-participant-panel__summary">
+                                        <span class="order-participant-panel__name">Грузоперевозчик</span>
+                                        <span class="order-participant-panel__meta" data-participant-summary="meta">{{ $carrierName ?: 'Транспортная компания, выполняющая перевозку' }}</span>
+                                    </span>
+                                    <span class="order-participant-panel__status {{ $carrierFilled ? 'order-participant-panel__status--filled order-participant-panel__status--carrier' : 'order-participant-panel__status--empty' }}" data-participant-badge>{{ $carrierFilled ? 'Заполнен' : 'Не указан' }}</span>
+                                    <span class="order-participant-panel__arrow" aria-hidden="true">
+                                        <svg><use href="/icons/sprite.svg#icon-doc-left-arrow"></use></svg>
+                                    </span>
+                                </button>
+                                <div id="participant-panel-carrier-body" class="order-participant-panel__body" data-participant-body>
+                                    <div class="order-participant-lookup" data-participant-lookup data-target-mode="hidden" data-target-input-name="carrier_counterparty_id">
+                                        <input type="hidden" name="carrier_counterparty_id" value="{{ $carrierCounterpartyId ?: '' }}" data-participant-hidden-input>
+                                        <label class="order-participant-lookup__field">
+                                            <span>Подбор перевозчика</span>
+                                            <div class="order-participant-lookup__control">
+                                                <input type="text" value="{{ $carrierName && $carrierName !== '—' ? $carrierName : '' }}" placeholder="Начните вводить название, ИНН или телефон" data-participant-search-input>
+                                                <button type="button" class="ad-btn" data-participant-clear>Очистить</button>
+                                            </div>
+                                        </label>
+                                        <p class="order-participant-lookup__status" data-participant-search-status hidden></p>
+                                        <div class="order-participant-lookup__results" data-participant-search-results hidden></div>
+                                    </div>
+                                    <div class="order-participant-panel__fields order-participant-panel__fields--two">
+                                        <div class="order-participant-panel__field">
+                                            <span class="order-participant-panel__label">Название / ФИО</span>
+                                            <div class="order-participant-panel__value">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-briefcase"></use></svg>
+                                                <span data-participant-field="name">{{ $carrierName ?: 'Не указан' }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="order-participant-panel__field">
+                                            <span class="order-participant-panel__label">Телефон</span>
+                                            <div class="order-participant-panel__value">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg>
+                                                <span data-participant-field="phone">{{ $carrierPhone ?: '—' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
 
-                            <button type="button" class="order-participant-card order-participant-card--driver" aria-label="Водитель">
-                                <span class="order-participant-card__icon order-participant-card__icon--driver" aria-hidden="true">
-                                    <svg><use href="/icons/sprite.svg#icon-doc-man"></use></svg>
-                                </span>
-                                <span class="order-participant-card__content">
-                                    <span class="order-participant-card__name">Водитель <span class="order-participant-card__check order-participant-card__check--green">✓</span></span>
-                                    <span class="order-participant-card__meta">{{ $driverName ?: 'Не указан' }}</span>
-                                </span>
-                                <span class="order-participant-card__status order-participant-card__status--green">Заполнен</span>
-                                <span class="order-participant-card__arrow" aria-hidden="true">
-                                    <svg><use href="/icons/sprite.svg#icon-doc-left-arrow"></use></svg>
-                                </span>
-                            </button>
+                            <section class="order-participant-panel order-participant-panel--driver is-open" data-participant-panel data-participant-role="driver" data-participant-filled="{{ $driverFilled ? '1' : '0' }}">
+                                <button type="button" class="order-participant-panel__toggle" data-participant-toggle aria-expanded="true" aria-controls="participant-panel-driver-body">
+                                    <span class="order-participant-panel__icon order-participant-panel__icon--driver" aria-hidden="true">
+                                        <svg><use href="/icons/sprite.svg#icon-doc-man"></use></svg>
+                                    </span>
+                                    <span class="order-participant-panel__summary">
+                                        <span class="order-participant-panel__name">Водитель</span>
+                                        <span class="order-participant-panel__meta" data-participant-summary="meta">{{ $driverName ?: 'Не указан' }}</span>
+                                    </span>
+                                    <span class="order-participant-panel__status {{ $driverFilled ? 'order-participant-panel__status--filled order-participant-panel__status--driver' : 'order-participant-panel__status--empty' }}" data-participant-badge>{{ $driverFilled ? 'Заполнен' : 'Не указан' }}</span>
+                                    <span class="order-participant-panel__arrow" aria-hidden="true">
+                                        <svg><use href="/icons/sprite.svg#icon-doc-left-arrow"></use></svg>
+                                    </span>
+                                </button>
+                                <div id="participant-panel-driver-body" class="order-participant-panel__body" data-participant-body>
+                                    <div class="order-participant-panel__fields order-participant-panel__fields--two">
+                                        <div class="order-participant-panel__field">
+                                            <span class="order-participant-panel__label">ФИО</span>
+                                            <div class="order-participant-panel__value">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-man"></use></svg>
+                                                <span>{{ $driverName ?: 'Не указан' }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="order-participant-panel__field">
+                                            <span class="order-participant-panel__label">Телефон</span>
+                                            <div class="order-participant-panel__value">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg>
+                                                <span>{{ $driverPhone ?: '—' }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="order-participant-panel__field">
+                                            <span class="order-participant-panel__label">Транспорт</span>
+                                            <div class="order-participant-panel__value">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-truck"></use></svg>
+                                                <span>{{ $driverTransport ?: '—' }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="order-participant-panel__field">
+                                            <span class="order-participant-panel__label">Гос. номер</span>
+                                            <div class="order-participant-panel__value">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-orders"></use></svg>
+                                                <span>{{ $driverPlate ?: '—' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
 
-                            <button type="button" class="order-participant-card order-participant-card--sender" aria-label="Грузоотправитель">
-                                <span class="order-participant-card__icon order-participant-card__icon--sender" aria-hidden="true">
-                                    <svg><use href="/icons/sprite.svg#icon-doc-package"></use></svg>
-                                </span>
-                                <span class="order-participant-card__content">
-                                    <span class="order-participant-card__name">Грузоотправитель <span class="order-participant-card__check order-participant-card__check--blue">✓</span></span>
-                                    <span class="order-participant-card__meta">{{ $senderName ?: 'Не указан' }}</span>
-                                </span>
-                                <span class="order-participant-card__status order-participant-card__status--blue">Заполнен</span>
-                                <span class="order-participant-card__arrow" aria-hidden="true">
-                                    <svg><use href="/icons/sprite.svg#icon-doc-left-arrow"></use></svg>
-                                </span>
-                            </button>
+                            <section class="order-participant-panel order-participant-panel--sender is-open" data-participant-panel data-participant-role="sender" data-participant-filled="{{ $senderFilled ? '1' : '0' }}">
+                                <button type="button" class="order-participant-panel__toggle" data-participant-toggle aria-expanded="true" aria-controls="participant-panel-sender-body">
+                                    <span class="order-participant-panel__icon order-participant-panel__icon--sender" aria-hidden="true">
+                                        <svg><use href="/icons/sprite.svg#icon-doc-package"></use></svg>
+                                    </span>
+                                    <span class="order-participant-panel__summary">
+                                        <span class="order-participant-panel__name">Грузоотправитель</span>
+                                        <span class="order-participant-panel__meta" data-participant-summary="meta">{{ $senderName ?: 'Не указан' }}</span>
+                                    </span>
+                                    <span class="order-participant-panel__status {{ $senderFilled ? 'order-participant-panel__status--filled order-participant-panel__status--sender' : 'order-participant-panel__status--empty' }}" data-participant-badge>{{ $senderFilled ? 'Заполнен' : 'Не указан' }}</span>
+                                    <span class="order-participant-panel__arrow" aria-hidden="true">
+                                        <svg><use href="/icons/sprite.svg#icon-doc-left-arrow"></use></svg>
+                                    </span>
+                                </button>
+                                <div id="participant-panel-sender-body" class="order-participant-panel__body" data-participant-body>
+                                    <div class="order-participant-lookup" data-participant-lookup data-target-mode="select" data-target-select-name="from_counterparty_id">
+                                        <label class="order-participant-lookup__field">
+                                            <span>Подбор грузоотправителя</span>
+                                            <div class="order-participant-lookup__control">
+                                                <input type="text" value="{{ $senderName && $senderName !== '—' ? $senderName : '' }}" placeholder="Начните вводить название, ИНН или телефон" data-participant-search-input>
+                                                <button type="button" class="ad-btn" data-participant-clear>Очистить</button>
+                                            </div>
+                                        </label>
+                                        <p class="order-participant-lookup__status" data-participant-search-status hidden></p>
+                                        <div class="order-participant-lookup__results" data-participant-search-results hidden></div>
+                                    </div>
+                                    <div class="order-participant-panel__fields order-participant-panel__fields--two">
+                                        <div class="order-participant-panel__field">
+                                            <span class="order-participant-panel__label">ФИО / Организация</span>
+                                            <div class="order-participant-panel__value">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-man"></use></svg>
+                                                <span data-participant-field="name">{{ $senderName ?: 'Не указан' }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="order-participant-panel__field">
+                                            <span class="order-participant-panel__label">Телефон</span>
+                                            <div class="order-participant-panel__value">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg>
+                                                <span data-participant-field="phone">{{ $senderPhone ?: '—' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
 
-                            <button type="button" class="order-participant-card order-participant-card--receiver" aria-label="Грузополучатель">
-                                <span class="order-participant-card__icon order-participant-card__icon--receiver" aria-hidden="true">
-                                    <svg><use href="/icons/sprite.svg#icon-doc-packagecheck"></use></svg>
-                                </span>
-                                <span class="order-participant-card__content">
-                                    <span class="order-participant-card__name">Грузополучатель <span class="order-participant-card__check order-participant-card__check--green">✓</span></span>
-                                    <span class="order-participant-card__meta">{{ $receiverName ?: 'Не указан' }}</span>
-                                </span>
-                                <span class="order-participant-card__status order-participant-card__status--emerald">Заполнен</span>
-                                <span class="order-participant-card__arrow" aria-hidden="true">
-                                    <svg><use href="/icons/sprite.svg#icon-doc-left-arrow"></use></svg>
-                                </span>
-                            </button>
+                            <section class="order-participant-panel order-participant-panel--receiver is-open" data-participant-panel data-participant-role="receiver" data-participant-filled="{{ $receiverFilled ? '1' : '0' }}">
+                                <button type="button" class="order-participant-panel__toggle" data-participant-toggle aria-expanded="true" aria-controls="participant-panel-receiver-body">
+                                    <span class="order-participant-panel__icon order-participant-panel__icon--receiver" aria-hidden="true">
+                                        <svg><use href="/icons/sprite.svg#icon-doc-packagecheck"></use></svg>
+                                    </span>
+                                    <span class="order-participant-panel__summary">
+                                        <span class="order-participant-panel__name">Грузополучатель</span>
+                                        <span class="order-participant-panel__meta" data-participant-summary="meta">{{ $receiverName ?: 'Не указан' }}</span>
+                                    </span>
+                                    <span class="order-participant-panel__status {{ $receiverFilled ? 'order-participant-panel__status--filled order-participant-panel__status--receiver' : 'order-participant-panel__status--empty' }}" data-participant-badge>{{ $receiverFilled ? 'Заполнен' : 'Не указан' }}</span>
+                                    <span class="order-participant-panel__arrow" aria-hidden="true">
+                                        <svg><use href="/icons/sprite.svg#icon-doc-left-arrow"></use></svg>
+                                    </span>
+                                </button>
+                                <div id="participant-panel-receiver-body" class="order-participant-panel__body" data-participant-body>
+                                    <div class="order-participant-lookup" data-participant-lookup data-target-mode="select" data-target-select-name="to_counterparty_id">
+                                        <label class="order-participant-lookup__field">
+                                            <span>Подбор грузополучателя</span>
+                                            <div class="order-participant-lookup__control">
+                                                <input type="text" value="{{ $receiverName && $receiverName !== '—' ? $receiverName : '' }}" placeholder="Начните вводить название, ИНН или телефон" data-participant-search-input>
+                                                <button type="button" class="ad-btn" data-participant-clear>Очистить</button>
+                                            </div>
+                                        </label>
+                                        <p class="order-participant-lookup__status" data-participant-search-status hidden></p>
+                                        <div class="order-participant-lookup__results" data-participant-search-results hidden></div>
+                                    </div>
+                                    <div class="order-participant-panel__fields order-participant-panel__fields--two">
+                                        <div class="order-participant-panel__field">
+                                            <span class="order-participant-panel__label">ФИО / Организация</span>
+                                            <div class="order-participant-panel__value">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-man"></use></svg>
+                                                <span data-participant-field="name">{{ $receiverName ?: 'Не указан' }}</span>
+                                            </div>
+                                        </div>
+                                        <div class="order-participant-panel__field">
+                                            <span class="order-participant-panel__label">Телефон</span>
+                                            <div class="order-participant-panel__value">
+                                                <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg>
+                                                <span data-participant-field="phone">{{ $receiverPhone ?: '—' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
                     </div>
 
@@ -408,19 +730,19 @@
                 <ul class="order-edit-participants">
                     <li>
                         <span class="order-edit-participants__name"><svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-briefcase"></use></svg>Грузоперевозчик</span>
-                        <span class="order-edit-participants__state">—</span>
+                        <span class="order-edit-participants__state {{ $carrierFilled ? 'is-ok' : '' }}" data-participant-side-state="carrier">{{ $carrierFilled ? '✓' : '—' }}</span>
                     </li>
                     <li>
                         <span class="order-edit-participants__name"><svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-man"></use></svg>Водитель</span>
-                        <span class="order-edit-participants__state is-ok">✓</span>
+                        <span class="order-edit-participants__state {{ $driverFilled ? 'is-ok' : '' }}" data-participant-side-state="driver">{{ $driverFilled ? '✓' : '—' }}</span>
                     </li>
                     <li>
                         <span class="order-edit-participants__name"><svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-package"></use></svg>Грузоотправитель</span>
-                        <span class="order-edit-participants__state is-ok">✓</span>
+                        <span class="order-edit-participants__state {{ $senderFilled ? 'is-ok' : '' }}" data-participant-side-state="sender">{{ $senderFilled ? '✓' : '—' }}</span>
                     </li>
                     <li>
                         <span class="order-edit-participants__name"><svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-packagecheck"></use></svg>Грузополучатель</span>
-                        <span class="order-edit-participants__state is-ok">✓</span>
+                        <span class="order-edit-participants__state {{ $receiverFilled ? 'is-ok' : '' }}" data-participant-side-state="receiver">{{ $receiverFilled ? '✓' : '—' }}</span>
                     </li>
                 </ul>
             </section>
@@ -429,7 +751,7 @@
                 <h3>Сводка</h3>
                 <ul class="order-edit-summary">
                     <li><span>Маршрут</span><em class="is-green">Заполнен</em></li>
-                    <li><span>Участники</span><em class="is-blue">{{ $participantsFilled }} / 4</em></li>
+                    <li><span>Участники</span><em class="is-blue" data-participants-progress>{{ $participantsFilled }} / 4</em></li>
                     <li><span>Груз</span><em class="is-gray">Не указан</em></li>
                 </ul>
             </section>

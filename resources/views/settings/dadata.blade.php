@@ -6,7 +6,7 @@
     <div class="settings-page">
         <header class="settings-page__head">
             <h1 class="ad-h1">Интеграция DaData</h1>
-            <p>API find-party: поиск организации или ИП по ИНН/ОГРН.</p>
+            <p>API DaData: автозаполнение по ИНН/ОГРН и поиск организаций/ИП по названию.</p>
             <div class="settings-page__actions">
                 <a class="ad-btn" href="{{ route('settings.icons.preview') }}">
                     Открыть превью иконок спрайта
@@ -87,7 +87,7 @@
 
                 <label class="settings-form__field">
                     <span>API key Router (детали маршрута)</span>
-                    <input type="text" name="yandex_router_api_key" value="{{ old('yandex_router_api_key', $yandexRouterApiKey ?? '') }}" placeholder="Введите API-ключ для ymaps3.route (опционально)">
+                    <input type="text" name="yandex_router_api_key" value="{{ old('yandex_router_api_key', $yandexRouterApiKey ?? '') }}" placeholder="Введите API-ключ HTTP Router API для расчёта расстояния по дорогам (опционально)">
                 </label>
 
                 <label class="settings-form__field">
@@ -96,8 +96,8 @@
                 </label>
 
                 <p class="settings-page__hint" role="note">
-                    Для честного подключения Yandex Maps v3 нужен отдельный JS API ключ с ограничением по HTTP Referer.
-                    Старый объединённый ключ оставлен только как резерв для обратной совместимости.
+                    Все API-ключи в этом разделе берутся только из базы данных (`integration_settings`).
+                    Значения из `.env` не используются для отображения в форме и не подмешиваются как резерв.
                 </p>
 
                 <div class="settings-form__actions">

@@ -23,7 +23,6 @@ class OrderStop extends Model
         'cargo_description',
         'cargo_weight',
         'cargo_volume',
-        'notes',
     ];
 
     protected $casts = [

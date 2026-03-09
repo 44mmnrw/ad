@@ -8,6 +8,7 @@ use App\Models\Counterparty;
 use App\Models\CounterpartyType;
 use App\Services\DaData\FindBankService;
 use App\Services\DaData\FindPartyService;
+use Illuminate\Support\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
@@ -26,7 +27,8 @@ class CounterpartyController extends Controller
 
         $counterparty = new Counterparty();
         $counterparty->type = $legalTypeId;
-        $counterparty->setRelation('typeRef', $types->first());
+        $counterparty = $this->applyCreatePrefill($request, $counterparty, $types, $legalTypeId);
+        $counterparty->setRelation('typeRef', $types->firstWhere('id', $counterparty->type) ?? $types->first());
         $counterparty->setRelation('contacts', collect());
         $counterparty->setRelation('bankAccounts', collect());
 
@@ -45,6 +47,60 @@ class CounterpartyController extends Controller
         ]);
     }
 
+    public function suggest(Request $request, FindPartyService $findPartyService): JsonResponse
+    {
+        $validated = $request->validate([
+            'query' => ['required', 'string', 'max:255'],
+        ]);
+
+        $query = trim((string) $validated['query']);
+
+        if (mb_strlen($query) < 2) {
+            return response()->json([
+                'suggestions' => [],
+            ]);
+        }
+
+        $localSuggestions = $this->searchLocalCounterparties($query);
+        $localInns = collect($localSuggestions)
+            ->pluck('counterparty.inn')
+            ->filter(static fn ($value) => is_string($value) && trim($value) !== '')
+            ->map(static fn (string $value) => trim($value))
+            ->values()
+            ->all();
+
+        $suggestions = collect($localSuggestions);
+        $dadataError = null;
+        $digits = preg_replace('/\D+/', '', $query) ?? '';
+
+        if (mb_strlen($query) >= 3 || in_array(strlen($digits), [10, 12, 13, 15], true)) {
+            try {
+                $result = $findPartyService->suggestByQuery($query, ['count' => 5]);
+                $dadataSuggestions = collect((array) ($result['suggestions'] ?? []))
+                    ->map(fn ($suggestion) => $this->mapDaDataCounterpartySuggestion($suggestion))
+                    ->filter(static function (?array $suggestion) use ($localInns): bool {
+                        if ($suggestion === null) {
+                            return false;
+                        }
+
+                        $inn = trim((string) data_get($suggestion, 'counterparty.inn', ''));
+
+                        return $inn === '' || ! in_array($inn, $localInns, true);
+                    })
+                    ->values();
+
+                $suggestions = $suggestions->concat($dadataSuggestions);
+            } catch (Throwable $exception) {
+                $dadataError = $exception->getMessage();
+            }
+        }
+
+        return response()->json([
+            'suggestions' => $suggestions->values()->all(),
+            'dadata_error' => $dadataError,
+        ]);
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $activeTab = (string) $request->input('active_tab', 'general');
@@ -57,7 +113,7 @@ class CounterpartyController extends Controller
 
         $validated = $this->validateCounterpartyPayload($request);
 
-        $counterparty = Counterparty::query()->create([
+        $counterparty = Counterparty::query()->create(array_merge([
             'type' => $validated['type'],
             'short_name' => $validated['short_name'] ?: null,
             'full_name' => $validated['full_name'] ?: null,
@@ -70,7 +126,7 @@ class CounterpartyController extends Controller
             'phone' => $validated['phone'],
             'email' => $validated['email'] ?: null,
             'notes' => $validated['notes'] ?: null,
-        ]);
+        ], $this->extractLegalAddressAttributesFromValidated($validated)));
 
         return redirect()
             ->route('counterparties.show', $counterparty)
@@ -305,7 +361,7 @@ class CounterpartyController extends Controller
 
         $validated = $this->validateCounterpartyPayload($request);
 
-        $counterparty->update([
+        $counterparty->update(array_merge([
             'type' => $validated['type'],
             'short_name' => $validated['short_name'] ?: null,
             'full_name' => $validated['full_name'] ?: null,
@@ -318,7 +374,7 @@ class CounterpartyController extends Controller
             'phone' => $validated['phone'],
             'email' => $validated['email'] ?: null,
             'notes' => $validated['notes'] ?: null,
-        ]);
+        ], $this->extractLegalAddressAttributesFromValidated($validated)));
 
         return redirect()
             ->route('counterparties.edit', ['counterparty' => $counterparty, 'tab' => 'general'])
@@ -461,24 +517,25 @@ class CounterpartyController extends Controller
                 ?? ''
             );
 
-            $address = (string) (
-                data_get($data, 'address.unrestricted_value')
-                ?? data_get($data, 'address.value')
+            $phone = trim((string) (
+                data_get($data, 'phones.0.value')
+                ?? data_get($data, 'phones.0.data.value')
                 ?? ''
-            );
+            ));
+            $addressAttributes = $this->extractLegalAddressAttributesFromDaDataParty($data);
 
             return response()->json([
                 'message' => 'Данные по ИНН/ОГРН успешно загружены.',
-                'data' => [
+                'data' => array_merge([
                     'type_kind' => $typeKind,
                     'short_name' => $shortName !== '' ? $shortName : null,
                     'full_name' => $fullName !== '' ? $fullName : null,
                     'inn' => (string) ($data['inn'] ?? $query),
                     'kpp' => (string) ($data['kpp'] ?? ''),
                     'ogrn' => (string) (($data['ogrn'] ?? $data['ogrnip'] ?? '')),
-                    'legal_address' => $address !== '' ? $address : null,
-                    'actual_address' => $address !== '' ? $address : null,
-                ],
+                    'phone' => $phone !== '' ? $phone : null,
+                    'actual_address' => null,
+                ], $addressAttributes),
             ]);
         } catch (Throwable $exception) {
             return response()->json([
@@ -555,8 +612,24 @@ class CounterpartyController extends Controller
             'inn' => ['nullable', 'string', 'max:12'],
             'kpp' => ['nullable', 'string', 'max:9'],
             'ogrn' => ['nullable', 'string', 'max:15'],
-            'legal_address' => ['nullable', 'string', 'max:255'],
-            'actual_address' => ['nullable', 'string', 'max:255'],
+            'legal_address' => ['nullable', 'string', 'max:1000'],
+            'actual_address' => ['nullable', 'string', 'max:1000'],
+            'legal_postal_code' => ['nullable', 'string', 'max:10'],
+            'legal_region' => ['nullable', 'string', 'max:150'],
+            'legal_city' => ['nullable', 'string', 'max:150'],
+            'legal_settlement' => ['nullable', 'string', 'max:150'],
+            'legal_street' => ['nullable', 'string', 'max:150'],
+            'legal_house' => ['nullable', 'string', 'max:50'],
+            'legal_block' => ['nullable', 'string', 'max:50'],
+            'legal_flat' => ['nullable', 'string', 'max:50'],
+            'legal_fias_id' => ['nullable', 'string', 'max:50'],
+            'legal_kladr_id' => ['nullable', 'string', 'max:20'],
+            'legal_geo_lat' => ['nullable', 'numeric'],
+            'legal_geo_lon' => ['nullable', 'numeric'],
+            'legal_qc' => ['nullable', 'integer', 'min:0', 'max:255'],
+            'legal_qc_geo' => ['nullable', 'integer', 'min:0', 'max:255'],
+            'legal_address_invalid' => ['nullable', 'boolean'],
+            'legal_address_data' => ['nullable', 'string'],
             'phone' => ['required', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
             'notes' => ['nullable', 'string'],
@@ -591,6 +664,103 @@ class CounterpartyController extends Controller
         return $validated;
     }
 
+    /**
+     * @return list<array{source: string,counterparty: array<string, mixed>,action_url: string}>
+     */
+    private function searchLocalCounterparties(string $query): array
+    {
+        return Counterparty::query()
+            ->with('typeRef')
+            ->where(function ($builder) use ($query): void {
+                $builder->where('short_name', 'like', "%{$query}%")
+                    ->orWhere('full_name', 'like', "%{$query}%")
+                    ->orWhere('inn', 'like', "%{$query}%")
+                    ->orWhere('phone', 'like', "%{$query}%")
+                    ->orWhere('email', 'like', "%{$query}%")
+                    ->orWhere('actual_address', 'like', "%{$query}%")
+                    ->orWhere('legal_address', 'like', "%{$query}%");
+            })
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->limit(8)
+            ->get()
+            ->map(function (Counterparty $counterparty): array {
+                $name = trim((string) ($counterparty->short_name ?: $counterparty->full_name ?: 'Без названия'));
+                $inn = trim((string) ($counterparty->inn ?? ''));
+                $phone = trim((string) ($counterparty->phone ?? ''));
+
+                return [
+                    'source' => 'local',
+                    'action_url' => route('counterparties.show', $counterparty),
+                    'counterparty' => [
+                        'id' => $counterparty->id,
+                        'name' => $name,
+                        'label' => $inn !== '' ? $name.' (ИНН '.$inn.')' : $name,
+                        'phone' => $phone !== '' ? $phone : '—',
+                        'inn' => $inn,
+                        'short_name' => trim((string) ($counterparty->short_name ?? '')),
+                        'full_name' => trim((string) ($counterparty->full_name ?? '')),
+                        'legal_address' => trim((string) ($counterparty->legal_address ?? '')),
+                        'actual_address' => trim((string) ($counterparty->actual_address ?? '')),
+                        'type_kind' => $this->resolveTypeKindById((int) $counterparty->type),
+                    ],
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array{source: string,counterparty: array<string, mixed>,action_url: string}|null
+     */
+    private function mapDaDataCounterpartySuggestion(mixed $suggestion): ?array
+    {
+        if (! is_array($suggestion)) {
+            return null;
+        }
+
+        $data = is_array($suggestion['data'] ?? null) ? $suggestion['data'] : [];
+        $partyType = mb_strtoupper((string) ($data['type'] ?? 'LEGAL'));
+        $typeKind = $partyType === 'INDIVIDUAL' ? 'entrepreneur' : 'legal';
+        $shortName = trim((string) (data_get($data, 'name.short_with_opf') ?? data_get($data, 'name.short') ?? ''));
+        $fullName = trim((string) (data_get($data, 'name.full_with_opf') ?? data_get($data, 'name.full') ?? ''));
+        $name = $shortName !== '' ? $shortName : ($fullName !== '' ? $fullName : trim((string) ($suggestion['value'] ?? 'Контрагент без названия')));
+        $phone = trim((string) (data_get($data, 'phones.0.value') ?? data_get($data, 'phones.0.data.value') ?? ''));
+        $inn = trim((string) ($data['inn'] ?? ''));
+        $addressAttributes = $this->extractLegalAddressAttributesFromDaDataParty($data);
+
+        $query = [
+            'prefill' => 1,
+            'type_kind' => $typeKind,
+            'short_name' => $shortName,
+            'full_name' => $fullName,
+            'inn' => $inn,
+            'kpp' => trim((string) ($data['kpp'] ?? '')),
+            'ogrn' => trim((string) (($data['ogrn'] ?? $data['ogrnip'] ?? ''))),
+            'phone' => $phone,
+        ];
+
+        $query = array_merge($query, $this->buildLegalAddressQueryParameters($addressAttributes));
+
+        return [
+            'source' => 'dadata',
+            'action_url' => route('counterparties.create', array_filter($query, static fn (mixed $value): bool => $value !== null && $value !== '')),
+            'counterparty' => array_merge([
+                'id' => null,
+                'name' => $name,
+                'label' => $inn !== '' ? $name.' (DaData, ИНН '.$inn.')' : $name.' (DaData)',
+                'phone' => $phone !== '' ? $phone : '—',
+                'inn' => $inn,
+                'short_name' => $shortName,
+                'full_name' => $fullName,
+                'kpp' => trim((string) ($data['kpp'] ?? '')),
+                'ogrn' => trim((string) (($data['ogrn'] ?? $data['ogrnip'] ?? ''))),
+                'actual_address' => '',
+                'type_kind' => $typeKind,
+            ], $addressAttributes),
+        ];
+    }
+
     private function resolveTypeKindById(int $typeId): string
     {
         $type = CounterpartyType::query()->find($typeId);
@@ -613,6 +783,204 @@ class CounterpartyController extends Controller
         }
 
         return 'legal';
+    }
+
+    private function resolveTypeIdByKind(string $kind, Collection $types, ?int $fallbackTypeId = null): ?int
+    {
+        $normalizedKind = trim($kind);
+
+        $matchedType = match ($normalizedKind) {
+            'person' => $types->first(fn ($type) => str_contains(mb_strtolower((string) $type->name), 'физ') || str_contains(mb_strtolower((string) $type->name), 'самозан')),
+            'entrepreneur' => $types->first(function ($type) {
+                $normalizedTypeName = mb_strtolower(trim((string) $type->name));
+
+                return preg_match('/(^|\s|[^а-яa-z])ип($|\s|[^а-яa-z])/u', $normalizedTypeName) === 1
+                    || str_contains($normalizedTypeName, 'индивидуал')
+                    || str_contains($normalizedTypeName, 'предприним');
+            }),
+            default => $types->first(fn ($type) => str_contains(mb_strtolower((string) $type->name), 'ооо')),
+        };
+
+        return $matchedType?->id ?? $fallbackTypeId ?? $types->first()?->id;
+    }
+
+    private function applyCreatePrefill(Request $request, Counterparty $counterparty, Collection $types, ?int $fallbackTypeId = null): Counterparty
+    {
+        if (! $request->boolean('prefill')) {
+            return $counterparty;
+        }
+
+        $counterparty->type = $this->resolveTypeIdByKind((string) $request->query('type_kind', 'legal'), $types, $fallbackTypeId);
+        $counterparty->short_name = $this->normalizeQueryValue($request->query('short_name'));
+        $counterparty->full_name = $this->normalizeQueryValue($request->query('full_name'));
+        $counterparty->inn = $this->normalizeQueryValue($request->query('inn'));
+        $counterparty->kpp = $this->normalizeQueryValue($request->query('kpp'));
+        $counterparty->ogrn = $this->normalizeQueryValue($request->query('ogrn'));
+        $counterparty->phone = $this->normalizeQueryValue($request->query('phone'));
+        $counterparty->legal_address = $this->normalizeQueryValue($request->query('legal_address'));
+        $counterparty->actual_address = $this->normalizeQueryValue($request->query('actual_address'));
+        $counterparty->legal_postal_code = $this->normalizeQueryValue($request->query('legal_postal_code'));
+        $counterparty->legal_region = $this->normalizeQueryValue($request->query('legal_region'));
+        $counterparty->legal_city = $this->normalizeQueryValue($request->query('legal_city'));
+        $counterparty->legal_settlement = $this->normalizeQueryValue($request->query('legal_settlement'));
+        $counterparty->legal_street = $this->normalizeQueryValue($request->query('legal_street'));
+        $counterparty->legal_house = $this->normalizeQueryValue($request->query('legal_house'));
+        $counterparty->legal_block = $this->normalizeQueryValue($request->query('legal_block'));
+        $counterparty->legal_flat = $this->normalizeQueryValue($request->query('legal_flat'));
+        $counterparty->legal_fias_id = $this->normalizeQueryValue($request->query('legal_fias_id'));
+        $counterparty->legal_kladr_id = $this->normalizeQueryValue($request->query('legal_kladr_id'));
+        $counterparty->legal_geo_lat = $this->normalizeQueryValue($request->query('legal_geo_lat'));
+        $counterparty->legal_geo_lon = $this->normalizeQueryValue($request->query('legal_geo_lon'));
+        $counterparty->legal_qc = $this->normalizeQueryValue($request->query('legal_qc'));
+        $counterparty->legal_qc_geo = $this->normalizeQueryValue($request->query('legal_qc_geo'));
+        $counterparty->legal_address_invalid = $this->normalizeQueryValue($request->query('legal_address_invalid'));
+        $counterparty->legal_address_data = $this->decodeJsonArray($request->query('legal_address_data'));
+
+        return $counterparty;
+    }
+
+    private function normalizeQueryValue(mixed $value): ?string
+    {
+        $normalized = trim((string) $value);
+
+        return $normalized !== '' ? $normalized : null;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
+    private function extractLegalAddressAttributesFromDaDataParty(array $data): array
+    {
+        $addressData = is_array(data_get($data, 'address.data')) ? data_get($data, 'address.data') : [];
+        $fullAddress = trim((string) (data_get($data, 'address.unrestricted_value') ?? data_get($data, 'address.value') ?? ''));
+        $addressInvalidity = data_get($data, 'address.invalidity');
+        $hasAddress = $fullAddress !== '' || $addressData !== [];
+
+        return [
+            'legal_address' => $fullAddress !== '' ? $fullAddress : null,
+            'legal_postal_code' => $this->nullableString(data_get($addressData, 'postal_code')),
+            'legal_region' => $this->nullableString(data_get($addressData, 'region_with_type')) ?? $this->nullableString(data_get($addressData, 'region')),
+            'legal_city' => $this->nullableString(data_get($addressData, 'city_with_type')) ?? $this->nullableString(data_get($addressData, 'city')),
+            'legal_settlement' => $this->nullableString(data_get($addressData, 'settlement_with_type')) ?? $this->nullableString(data_get($addressData, 'settlement')),
+            'legal_street' => $this->nullableString(data_get($addressData, 'street_with_type')) ?? $this->nullableString(data_get($addressData, 'street')),
+            'legal_house' => $this->nullableString(data_get($addressData, 'house')),
+            'legal_block' => $this->nullableString(data_get($addressData, 'block')),
+            'legal_flat' => $this->nullableString(data_get($addressData, 'flat')),
+            'legal_fias_id' => $this->nullableString(data_get($addressData, 'fias_id')),
+            'legal_kladr_id' => $this->nullableString(data_get($addressData, 'kladr_id')),
+            'legal_geo_lat' => $this->nullableFloat(data_get($addressData, 'geo_lat')),
+            'legal_geo_lon' => $this->nullableFloat(data_get($addressData, 'geo_lon')),
+            'legal_qc' => $this->nullableInt(data_get($addressData, 'qc')),
+            'legal_qc_geo' => $this->nullableInt(data_get($addressData, 'qc_geo')),
+            'legal_address_invalid' => $hasAddress ? $addressInvalidity !== null : null,
+            'legal_address_data' => $addressData !== [] ? $addressData : null,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $validated
+     * @return array<string, mixed>
+     */
+    private function extractLegalAddressAttributesFromValidated(array $validated): array
+    {
+        return [
+            'legal_postal_code' => $this->nullableString($validated['legal_postal_code'] ?? null),
+            'legal_region' => $this->nullableString($validated['legal_region'] ?? null),
+            'legal_city' => $this->nullableString($validated['legal_city'] ?? null),
+            'legal_settlement' => $this->nullableString($validated['legal_settlement'] ?? null),
+            'legal_street' => $this->nullableString($validated['legal_street'] ?? null),
+            'legal_house' => $this->nullableString($validated['legal_house'] ?? null),
+            'legal_block' => $this->nullableString($validated['legal_block'] ?? null),
+            'legal_flat' => $this->nullableString($validated['legal_flat'] ?? null),
+            'legal_fias_id' => $this->nullableString($validated['legal_fias_id'] ?? null),
+            'legal_kladr_id' => $this->nullableString($validated['legal_kladr_id'] ?? null),
+            'legal_geo_lat' => $this->nullableFloat($validated['legal_geo_lat'] ?? null),
+            'legal_geo_lon' => $this->nullableFloat($validated['legal_geo_lon'] ?? null),
+            'legal_qc' => $this->nullableInt($validated['legal_qc'] ?? null),
+            'legal_qc_geo' => $this->nullableInt($validated['legal_qc_geo'] ?? null),
+            'legal_address_invalid' => $this->nullableBoolean($validated['legal_address_invalid'] ?? null),
+            'legal_address_data' => $this->decodeJsonArray($validated['legal_address_data'] ?? null),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     * @return array<string, string>
+     */
+    private function buildLegalAddressQueryParameters(array $attributes): array
+    {
+        $result = [];
+
+        foreach ($attributes as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+
+            if (is_array($value)) {
+                $result[$key] = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '';
+                continue;
+            }
+
+            if (is_bool($value)) {
+                $result[$key] = $value ? '1' : '0';
+                continue;
+            }
+
+            $result[$key] = (string) $value;
+        }
+
+        return $result;
+    }
+
+    private function nullableString(mixed $value): ?string
+    {
+        $normalized = trim((string) $value);
+
+        return $normalized !== '' ? $normalized : null;
+    }
+
+    private function nullableFloat(mixed $value): ?float
+    {
+        return is_numeric($value) ? (float) $value : null;
+    }
+
+    private function nullableInt(mixed $value): ?int
+    {
+        return is_numeric($value) ? (int) $value : null;
+    }
+
+    private function nullableBoolean(mixed $value): ?bool
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        $normalized = mb_strtolower(trim((string) $value));
+
+        return match ($normalized) {
+            '1', 'true' => true,
+            '0', 'false' => false,
+            default => null,
+        };
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function decodeJsonArray(mixed $value): ?array
+    {
+        if (! is_string($value) || trim($value) === '') {
+            return null;
+        }
+
+        $decoded = json_decode($value, true);
+
+        return is_array($decoded) ? $decoded : null;
     }
 
     private function loadCounterpartyDetails(Counterparty $counterparty): Counterparty

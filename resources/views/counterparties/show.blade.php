@@ -32,7 +32,7 @@
             <div class="cp-alert cp-alert--success" role="status">{{ session('status') }}</div>
         @endif
 
-        @if ($errors->any())
+        @if (isset($errors) && $errors->any())
             <div class="cp-create__errors" role="alert">
                 <p>Не удалось сохранить данные:</p>
                 <ul>

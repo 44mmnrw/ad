@@ -243,11 +243,7 @@ class GeocodeService
 
     private function resolveIntegrationValue(string $settingKey): string
     {
-        return trim((string) IntegrationSetting::getValue(
-            self::INTEGRATION,
-            $settingKey,
-            config("services.yandex_maps.{$settingKey}")
-        ));
+        return trim((string) IntegrationSetting::getValue(self::INTEGRATION, $settingKey, ''));
     }
 
     /**

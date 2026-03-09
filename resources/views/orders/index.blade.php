@@ -30,10 +30,11 @@
                 @php
                     $statusOptions = [
                         'all' => 'Все',
-                        'loading' => 'Загрузка',
-                        'in_transit' => 'В пути',
-                        'unloading' => 'Разгрузка',
+                        'new' => 'Новые',
+                        'assigned' => 'Назначены',
+                        'in_progress' => 'В работе',
                         'completed' => 'Завершено',
+                        'cancelled' => 'Отменено',
                     ];
                 @endphp
 

@@ -224,6 +224,132 @@ const initCustomSelects = (root = document) => {
 
 initCustomSelects();
 
+const initCounterpartyLiveSearch = () => {
+	const forms = document.querySelectorAll('[data-counterparty-search-form]');
+
+	forms.forEach((form) => {
+		const input = form.querySelector('#counterparties-search');
+		const resultsNode = form.querySelector('[data-counterparty-suggest-results]');
+		const statusNode = form.querySelector('[data-counterparty-suggest-status]');
+		const suggestUrl = form.dataset.counterpartySuggestUrl;
+		let debounceTimer = null;
+
+		if (!(input instanceof HTMLInputElement) || !(resultsNode instanceof HTMLElement) || !(statusNode instanceof HTMLElement) || !suggestUrl) {
+			return;
+		}
+
+		const hideResults = () => {
+			resultsNode.hidden = true;
+			resultsNode.innerHTML = '';
+		};
+
+		const showStatus = (message, state = 'info') => {
+			statusNode.hidden = !message;
+			statusNode.textContent = message;
+			statusNode.classList.remove('is-success', 'is-error');
+
+			if (state === 'success') {
+				statusNode.classList.add('is-success');
+			}
+
+			if (state === 'error') {
+				statusNode.classList.add('is-error');
+			}
+		};
+
+		const renderResults = (suggestions) => {
+			resultsNode.innerHTML = '';
+
+			if (!Array.isArray(suggestions) || suggestions.length === 0) {
+				hideResults();
+				return;
+			}
+
+			suggestions.forEach((item) => {
+				const counterparty = item?.counterparty || {};
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = 'cp-search-suggest__item';
+				button.innerHTML = `
+					<span class="cp-search-suggest__title">${counterparty.label || counterparty.name || 'Контрагент'}</span>
+					<span class="cp-search-suggest__meta">${counterparty.phone || 'Телефон не указан'}${item.source === 'dadata' ? ' · DaData · создать карточку' : ' · Открыть карточку'}</span>
+				`;
+
+				button.addEventListener('click', () => {
+					if (typeof item?.action_url === 'string' && item.action_url !== '') {
+						window.location.href = item.action_url;
+					}
+				});
+
+				resultsNode.appendChild(button);
+			});
+
+			resultsNode.hidden = false;
+		};
+
+		const executeSearch = async () => {
+			const query = input.value.trim();
+
+			if (query.length < 2) {
+				hideResults();
+				showStatus('');
+				return;
+			}
+
+			showStatus('Ищу в базе и через DaData...');
+
+			try {
+				const url = new URL(suggestUrl, window.location.origin);
+				url.searchParams.set('query', query);
+
+				const response = await fetch(url.toString(), {
+					headers: {
+						Accept: 'application/json',
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+				});
+
+				const json = await response.json();
+
+				if (!response.ok) {
+					throw new Error(json?.message || 'Не удалось выполнить поиск контрагентов.');
+				}
+
+				renderResults(json?.suggestions || []);
+
+				const hasSuggestions = Array.isArray(json?.suggestions) && json.suggestions.length > 0;
+				const emptyMessage = json?.dadata_error
+					? `DaData недоступен: ${json.dadata_error}`
+					: 'Ничего не найдено.';
+
+				showStatus(hasSuggestions ? 'Выберите подходящий вариант.' : emptyMessage, hasSuggestions ? 'success' : 'error');
+			} catch (error) {
+				hideResults();
+				showStatus(error instanceof Error ? error.message : 'Не удалось выполнить поиск контрагентов.', 'error');
+			}
+		};
+
+		input.addEventListener('input', () => {
+			window.clearTimeout(debounceTimer);
+			debounceTimer = window.setTimeout(executeSearch, 300);
+		});
+
+		input.addEventListener('focus', () => {
+			if (input.value.trim().length >= 2) {
+				executeSearch();
+			}
+		});
+
+		document.addEventListener('click', (event) => {
+			if (!form.contains(event.target)) {
+				hideResults();
+			}
+		});
+	});
+};
+
+initCounterpartyLiveSearch();
+
 const fallbackCopyToClipboard = (text) => {
 	const textarea = document.createElement('textarea');
 	textarea.value = text;
@@ -328,6 +454,770 @@ const initOrderEditTabs = () => {
 
 initOrderEditTabs();
 
+const initOrderParticipantPanels = () => {
+	const panels = document.querySelectorAll('[data-participant-panel]');
+
+	panels.forEach((panel) => {
+		const toggle = panel.querySelector('[data-participant-toggle]');
+		const body = panel.querySelector('[data-participant-body]');
+
+		if (!(toggle instanceof HTMLButtonElement) || !(body instanceof HTMLElement)) {
+			return;
+		}
+
+		const setOpenState = (isOpen) => {
+			panel.classList.toggle('is-open', isOpen);
+			toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+			body.hidden = !isOpen;
+		};
+
+		setOpenState(panel.classList.contains('is-open'));
+
+		toggle.addEventListener('click', () => {
+			setOpenState(!panel.classList.contains('is-open'));
+		});
+	});
+};
+
+initOrderParticipantPanels();
+
+const initOrderParticipantLookup = () => {
+	const forms = document.querySelectorAll('form.order-edit');
+
+	forms.forEach((form) => {
+		const searchUrl = form.dataset.participantSearchUrl;
+		const resolveUrl = form.dataset.participantResolveUrl;
+		const csrfToken = form.querySelector('input[name="_token"]')?.value || '';
+
+		if (!searchUrl || !resolveUrl) {
+			return;
+		}
+
+		const participantPanels = Array.from(form.querySelectorAll('[data-participant-panel]'));
+
+		const setBadgeState = (panel, isFilled) => {
+			const badge = panel.querySelector('[data-participant-badge]');
+			if (!(badge instanceof HTMLElement)) {
+				return;
+			}
+
+			badge.textContent = isFilled ? 'Заполнен' : 'Не указан';
+			badge.classList.toggle('order-participant-panel__status--filled', isFilled);
+			badge.classList.toggle('order-participant-panel__status--empty', !isFilled);
+		};
+
+		const updateParticipantsProgress = () => {
+			const filledCount = participantPanels.filter((panel) => panel.dataset.participantFilled === '1').length;
+
+			form.querySelectorAll('[data-participants-progress]').forEach((node) => {
+				node.textContent = `${filledCount}/4`;
+			});
+
+			participantPanels.forEach((panel) => {
+				const role = panel.dataset.participantRole;
+				if (!role) {
+					return;
+				}
+
+				const stateNode = form.querySelector(`[data-participant-side-state="${role}"]`);
+				if (!(stateNode instanceof HTMLElement)) {
+					return;
+				}
+
+				const isFilled = panel.dataset.participantFilled === '1';
+				stateNode.textContent = isFilled ? '✓' : '—';
+				stateNode.classList.toggle('is-ok', isFilled);
+			});
+		};
+
+		const syncSelectOption = (selectName, counterparty) => {
+			const select = form.querySelector(`select[name="${selectName}"]`);
+			if (!(select instanceof HTMLSelectElement) || !counterparty?.id) {
+				return;
+			}
+
+			let option = Array.from(select.options).find((item) => item.value === `${counterparty.id}`);
+
+			if (!option) {
+				option = document.createElement('option');
+				option.value = `${counterparty.id}`;
+				select.appendChild(option);
+			}
+
+			option.textContent = counterparty.label || counterparty.name || `Контрагент #${counterparty.id}`;
+			option.dataset.counterpartyName = counterparty.name || '';
+			option.dataset.counterpartyPhone = counterparty.phone || '—';
+			option.dataset.counterpartyInn = counterparty.inn || '';
+			select.value = `${counterparty.id}`;
+			customSelectRegistry.get(select)?.rebuild?.();
+			select.dispatchEvent(new Event('change', { bubbles: true }));
+		};
+
+		const clearSelectOption = (selectName) => {
+			const select = form.querySelector(`select[name="${selectName}"]`);
+			if (!(select instanceof HTMLSelectElement)) {
+				return;
+			}
+
+			select.value = '';
+			customSelectRegistry.get(select)?.rebuild?.();
+			select.dispatchEvent(new Event('change', { bubbles: true }));
+		};
+
+		const applyCounterpartyToPanel = (panel, counterparty) => {
+			const name = counterparty?.name?.trim() || 'Не указан';
+			const phone = counterparty?.phone?.trim() || '—';
+			const summary = panel.querySelector('[data-participant-summary="meta"]');
+			const nameField = panel.querySelector('[data-participant-field="name"]');
+			const phoneField = panel.querySelector('[data-participant-field="phone"]');
+
+			if (summary instanceof HTMLElement) {
+				summary.textContent = name;
+			}
+
+			if (nameField instanceof HTMLElement) {
+				nameField.textContent = name;
+			}
+
+			if (phoneField instanceof HTMLElement) {
+				phoneField.textContent = phone;
+			}
+
+			const isFilled = name !== 'Не указан' || phone !== '—';
+			panel.dataset.participantFilled = isFilled ? '1' : '0';
+			setBadgeState(panel, isFilled);
+			updateParticipantsProgress();
+		};
+
+		const showLookupStatus = (lookup, message, state = 'info') => {
+			const node = lookup.querySelector('[data-participant-search-status]');
+			if (!(node instanceof HTMLElement)) {
+				return;
+			}
+
+			node.hidden = !message;
+			node.textContent = message;
+			node.classList.remove('is-success', 'is-error');
+
+			if (state === 'success') {
+				node.classList.add('is-success');
+			}
+
+			if (state === 'error') {
+				node.classList.add('is-error');
+			}
+		};
+
+		const hideLookupResults = (lookup) => {
+			const node = lookup.querySelector('[data-participant-search-results]');
+			if (!(node instanceof HTMLElement)) {
+				return;
+			}
+
+			node.hidden = true;
+			node.innerHTML = '';
+		};
+
+		const renderLookupResults = (lookup, suggestions, onSelect) => {
+			const node = lookup.querySelector('[data-participant-search-results]');
+			if (!(node instanceof HTMLElement)) {
+				return;
+			}
+
+			node.innerHTML = '';
+
+			if (!Array.isArray(suggestions) || suggestions.length === 0) {
+				node.hidden = true;
+				return;
+			}
+
+			suggestions.forEach((item) => {
+				const counterparty = item?.counterparty || {};
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = 'order-participant-lookup__result';
+				button.innerHTML = `
+					<span class="order-participant-lookup__result-title">${counterparty.label || counterparty.name || 'Контрагент'}</span>
+					<span class="order-participant-lookup__result-meta">${counterparty.phone || 'Телефон не указан'}${item.source === 'dadata' ? ' · DaData' : ' · База'}</span>
+				`;
+
+				button.addEventListener('click', () => onSelect(item));
+				node.appendChild(button);
+			});
+
+			node.hidden = false;
+		};
+
+		const lookupHandlers = Array.from(form.querySelectorAll('[data-participant-lookup]'));
+
+		lookupHandlers.forEach((lookup) => {
+			const panel = lookup.closest('[data-participant-panel]');
+			const input = lookup.querySelector('[data-participant-search-input]');
+			const clearButton = lookup.querySelector('[data-participant-clear]');
+			const role = panel?.dataset.participantRole || '';
+			const targetMode = lookup.dataset.targetMode || 'select';
+			const targetSelectName = lookup.dataset.targetSelectName || '';
+			const targetInputName = lookup.dataset.targetInputName || '';
+			let debounceTimer = null;
+
+			if (!(panel instanceof HTMLElement) || !(input instanceof HTMLInputElement)) {
+				return;
+			}
+
+			const resolveSelection = async (payload) => {
+				const body = new URLSearchParams();
+				body.append('_token', csrfToken);
+				body.append('source', payload?.source || 'local');
+				body.append('role', role);
+
+				Object.entries(payload?.counterparty || {}).forEach(([key, value]) => {
+					if (value === null || value === undefined) {
+						return;
+					}
+
+					body.append(key, `${value}`);
+				});
+
+				const response = await fetch(resolveUrl, {
+					method: 'POST',
+					headers: {
+						Accept: 'application/json',
+						'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+					body: body.toString(),
+				});
+
+				const json = await response.json();
+				if (!response.ok) {
+					throw new Error(json?.message || 'Не удалось сохранить контрагента.');
+				}
+
+				return json?.counterparty || null;
+			};
+
+			const executeSearch = async () => {
+				const query = input.value.trim();
+				if (query.length < 2) {
+					hideLookupResults(lookup);
+					showLookupStatus(lookup, '');
+					return;
+				}
+
+				showLookupStatus(lookup, 'Ищу совпадения в базе и через DaData...');
+
+				try {
+					const url = new URL(searchUrl, window.location.origin);
+					url.searchParams.set('query', query);
+					url.searchParams.set('role', role);
+
+					const response = await fetch(url.toString(), {
+						headers: {
+							Accept: 'application/json',
+							'X-Requested-With': 'XMLHttpRequest',
+						},
+					});
+
+					const json = await response.json();
+					if (!response.ok) {
+						throw new Error(json?.message || 'Не удалось выполнить поиск.');
+					}
+
+					renderLookupResults(lookup, json?.suggestions || [], async (item) => {
+						try {
+							showLookupStatus(lookup, 'Сохраняю выбранного контрагента...');
+							const counterparty = await resolveSelection(item);
+							if (!counterparty) {
+								throw new Error('Контрагент не был получен от сервера.');
+							}
+
+							input.value = counterparty.name || '';
+							applyCounterpartyToPanel(panel, counterparty);
+
+							if (targetMode === 'select' && targetSelectName) {
+								syncSelectOption(targetSelectName, counterparty);
+							}
+
+							if (targetMode === 'hidden' && targetInputName) {
+								const hiddenInput = lookup.querySelector('[data-participant-hidden-input]')
+									|| form.querySelector(`input[name="${targetInputName}"]`);
+
+								if (hiddenInput instanceof HTMLInputElement) {
+									hiddenInput.value = `${counterparty.id || ''}`;
+								}
+							}
+
+							hideLookupResults(lookup);
+							showLookupStatus(lookup, 'Контрагент выбран.', 'success');
+						} catch (error) {
+							showLookupStatus(lookup, error instanceof Error ? error.message : 'Не удалось выбрать контрагента.', 'error');
+						}
+					});
+
+					const hasSuggestions = Array.isArray(json?.suggestions) && json.suggestions.length > 0;
+					const emptyMessage = json?.dadata_error
+						? `DaData недоступен: ${json.dadata_error}`
+						: 'Ничего не найдено.';
+
+					showLookupStatus(
+						lookup,
+						hasSuggestions ? 'Выберите подходящий вариант.' : emptyMessage,
+						hasSuggestions ? 'success' : 'error',
+					);
+				} catch (error) {
+					hideLookupResults(lookup);
+					showLookupStatus(lookup, error instanceof Error ? error.message : 'Не удалось выполнить поиск.', 'error');
+				}
+			};
+
+			input.addEventListener('input', () => {
+				window.clearTimeout(debounceTimer);
+				debounceTimer = window.setTimeout(executeSearch, 300);
+			});
+
+			input.addEventListener('focus', () => {
+				if (input.value.trim().length >= 2) {
+					executeSearch();
+				}
+			});
+
+			clearButton?.addEventListener('click', () => {
+				input.value = '';
+				hideLookupResults(lookup);
+				showLookupStatus(lookup, 'Выбор очищен.');
+				applyCounterpartyToPanel(panel, { name: 'Не указан', phone: '—' });
+
+				if (targetMode === 'select' && targetSelectName) {
+					clearSelectOption(targetSelectName);
+				}
+
+				if (targetMode === 'hidden' && targetInputName) {
+					const hiddenInput = lookup.querySelector('[data-participant-hidden-input]')
+						|| form.querySelector(`input[name="${targetInputName}"]`);
+
+					if (hiddenInput instanceof HTMLInputElement) {
+						hiddenInput.value = '';
+					}
+				}
+			});
+		});
+
+		form.querySelectorAll('select[data-sync-participant-role]').forEach((select) => {
+			if (!(select instanceof HTMLSelectElement)) {
+				return;
+			}
+
+			const role = select.dataset.syncParticipantRole;
+			const panel = form.querySelector(`[data-participant-panel][data-participant-role="${role}"]`);
+			if (!(panel instanceof HTMLElement)) {
+				return;
+			}
+
+			select.addEventListener('change', () => {
+				const option = select.selectedOptions[0];
+				if (!(option instanceof HTMLOptionElement) || !option.value) {
+					applyCounterpartyToPanel(panel, { name: 'Не указан', phone: '—' });
+					return;
+				}
+
+				applyCounterpartyToPanel(panel, {
+					name: option.dataset.counterpartyName || option.textContent || 'Не указан',
+					phone: option.dataset.counterpartyPhone || '—',
+				});
+			});
+		});
+
+		updateParticipantsProgress();
+	});
+};
+
+initOrderParticipantLookup();
+
+const initOrderCustomerLookup = () => {
+	const forms = document.querySelectorAll('form.order-edit');
+
+	forms.forEach((form) => {
+		const searchUrl = form.dataset.participantSearchUrl;
+		const autofillUrl = form.dataset.customerAutofillUrl;
+		const lookup = form.querySelector('[data-customer-lookup]');
+
+		if (!(lookup instanceof HTMLElement) || !searchUrl) {
+			return;
+		}
+
+		const input = lookup.querySelector('[data-customer-search-input]');
+		const autofillButton = lookup.querySelector('[data-customer-autofill]');
+		const clearButton = lookup.querySelector('[data-customer-clear]');
+		const statusNode = lookup.querySelector('[data-customer-search-status]');
+		const resultsNode = lookup.querySelector('[data-customer-search-results]');
+		const customerIdInput = form.querySelector('input[name="customer_id"]');
+		const customerCounterpartyIdInput = form.querySelector('input[name="customer_counterparty_id"]');
+		const customerContactIdInput = form.querySelector('input[name="customer_contact_id"]');
+		const customerNameInput = form.querySelector('input[name="customer_name"]');
+		const customerContactNameInput = form.querySelector('input[name="customer_contact_name"]');
+		const customerPhoneInput = form.querySelector('input[name="customer_phone"]');
+		const customerEmailInput = form.querySelector('input[name="customer_email"]');
+		const customerInnInput = form.querySelector('input[name="customer_inn"]');
+		const customerLegalAddressInput = form.querySelector('input[name="customer_legal_address"]');
+		const customerLegalPostalCodeInput = form.querySelector('input[name="customer_legal_postal_code"]');
+		const customerLegalRegionInput = form.querySelector('input[name="customer_legal_region"]');
+		const customerLegalCityInput = form.querySelector('input[name="customer_legal_city"]');
+		const customerLegalSettlementInput = form.querySelector('input[name="customer_legal_settlement"]');
+		const customerLegalStreetInput = form.querySelector('input[name="customer_legal_street"]');
+		const customerLegalHouseInput = form.querySelector('input[name="customer_legal_house"]');
+		const customerLegalBlockInput = form.querySelector('input[name="customer_legal_block"]');
+		const customerLegalFlatInput = form.querySelector('input[name="customer_legal_flat"]');
+		const customerLegalFiasIdInput = form.querySelector('input[name="customer_legal_fias_id"]');
+		const customerLegalKladrIdInput = form.querySelector('input[name="customer_legal_kladr_id"]');
+		const customerLegalGeoLatInput = form.querySelector('input[name="customer_legal_geo_lat"]');
+		const customerLegalGeoLonInput = form.querySelector('input[name="customer_legal_geo_lon"]');
+		const customerLegalQcInput = form.querySelector('input[name="customer_legal_qc"]');
+		const customerLegalQcGeoInput = form.querySelector('input[name="customer_legal_qc_geo"]');
+		const customerLegalAddressInvalidInput = form.querySelector('input[name="customer_legal_address_invalid"]');
+		const customerLegalAddressDataInput = form.querySelector('input[name="customer_legal_address_data"]');
+		const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || form.querySelector('input[name="_token"]')?.value || '';
+		let debounceTimer = null;
+
+		if (!(input instanceof HTMLInputElement) || !(statusNode instanceof HTMLElement) || !(resultsNode instanceof HTMLElement)) {
+			return;
+		}
+
+		const serializeFieldValue = (value) => {
+			if (value === null || value === undefined) {
+				return '';
+			}
+
+			if (typeof value === 'object') {
+				try {
+					return JSON.stringify(value);
+				} catch (error) {
+					return '';
+				}
+			}
+
+			if (typeof value === 'boolean') {
+				return value ? '1' : '0';
+			}
+
+			return `${value}`;
+		};
+
+		const setInputValue = (inputNode, value, { preserveEmpty = false } = {}) => {
+			if (!(inputNode instanceof HTMLInputElement)) {
+				return;
+			}
+
+			const serialized = serializeFieldValue(value);
+
+			if (serialized === '' && preserveEmpty) {
+				return;
+			}
+
+			inputNode.value = serialized;
+		};
+
+		const applyCustomerLegalAddress = (payload = {}, { preserveEmpty = false } = {}) => {
+			setInputValue(customerLegalAddressInput, payload.legal_address, { preserveEmpty });
+			setInputValue(customerLegalPostalCodeInput, payload.legal_postal_code, { preserveEmpty });
+			setInputValue(customerLegalRegionInput, payload.legal_region, { preserveEmpty });
+			setInputValue(customerLegalCityInput, payload.legal_city, { preserveEmpty });
+			setInputValue(customerLegalSettlementInput, payload.legal_settlement, { preserveEmpty });
+			setInputValue(customerLegalStreetInput, payload.legal_street, { preserveEmpty });
+			setInputValue(customerLegalHouseInput, payload.legal_house, { preserveEmpty });
+			setInputValue(customerLegalBlockInput, payload.legal_block, { preserveEmpty });
+			setInputValue(customerLegalFlatInput, payload.legal_flat, { preserveEmpty });
+			setInputValue(customerLegalFiasIdInput, payload.legal_fias_id, { preserveEmpty });
+			setInputValue(customerLegalKladrIdInput, payload.legal_kladr_id, { preserveEmpty });
+			setInputValue(customerLegalGeoLatInput, payload.legal_geo_lat, { preserveEmpty });
+			setInputValue(customerLegalGeoLonInput, payload.legal_geo_lon, { preserveEmpty });
+			setInputValue(customerLegalQcInput, payload.legal_qc, { preserveEmpty });
+			setInputValue(customerLegalQcGeoInput, payload.legal_qc_geo, { preserveEmpty });
+			setInputValue(customerLegalAddressInvalidInput, payload.legal_address_invalid, { preserveEmpty });
+			setInputValue(customerLegalAddressDataInput, payload.legal_address_data, { preserveEmpty });
+		};
+
+		const showStatus = (message, state = 'info') => {
+			statusNode.hidden = !message;
+			statusNode.textContent = message;
+			statusNode.classList.remove('is-success', 'is-error');
+
+			if (state === 'success') {
+				statusNode.classList.add('is-success');
+			}
+
+			if (state === 'error') {
+				statusNode.classList.add('is-error');
+			}
+		};
+
+		const hideResults = () => {
+			resultsNode.hidden = true;
+			resultsNode.innerHTML = '';
+		};
+
+		const applyCustomer = (counterparty = {}) => {
+			if (customerIdInput instanceof HTMLInputElement) {
+				customerIdInput.value = `${counterparty.customer_id || ''}`;
+			}
+
+			if (customerCounterpartyIdInput instanceof HTMLInputElement) {
+				customerCounterpartyIdInput.value = `${counterparty.id || ''}`;
+			}
+
+			if (customerContactIdInput instanceof HTMLInputElement) {
+				customerContactIdInput.value = '';
+			}
+
+			if (customerNameInput instanceof HTMLInputElement) {
+				customerNameInput.value = counterparty.name || counterparty.short_name || counterparty.full_name || '';
+			}
+
+			if (customerContactNameInput instanceof HTMLInputElement) {
+				customerContactNameInput.value = counterparty.contact_name || '';
+			}
+
+			if (customerPhoneInput instanceof HTMLInputElement) {
+				customerPhoneInput.value = counterparty.phone && counterparty.phone !== '—' ? counterparty.phone : '';
+			}
+
+			if (customerEmailInput instanceof HTMLInputElement) {
+				customerEmailInput.value = counterparty.email || '';
+			}
+
+			if (customerInnInput instanceof HTMLInputElement) {
+				customerInnInput.value = counterparty.inn || '';
+			}
+
+			applyCustomerLegalAddress(counterparty);
+		};
+
+		const applyCustomerAutofill = (payload = {}) => {
+			if (customerIdInput instanceof HTMLInputElement) {
+				customerIdInput.value = '';
+			}
+
+			if (customerCounterpartyIdInput instanceof HTMLInputElement) {
+				customerCounterpartyIdInput.value = '';
+			}
+
+			if (customerContactIdInput instanceof HTMLInputElement) {
+				customerContactIdInput.value = '';
+			}
+
+			const resolvedName = payload.name || payload.short_name || payload.full_name || '';
+
+			if (input instanceof HTMLInputElement) {
+				input.value = resolvedName;
+			}
+
+			if (customerNameInput instanceof HTMLInputElement) {
+				customerNameInput.value = resolvedName;
+			}
+
+			if (customerContactNameInput instanceof HTMLInputElement && payload.contact_name) {
+				customerContactNameInput.value = payload.contact_name;
+			}
+
+			if (customerPhoneInput instanceof HTMLInputElement && payload.phone) {
+				customerPhoneInput.value = payload.phone;
+			}
+
+			if (customerEmailInput instanceof HTMLInputElement && payload.email) {
+				customerEmailInput.value = payload.email;
+			}
+
+			if (customerInnInput instanceof HTMLInputElement) {
+				customerInnInput.value = payload.inn || '';
+			}
+
+			applyCustomerLegalAddress(payload);
+		};
+
+		const renderResults = (suggestions) => {
+			resultsNode.innerHTML = '';
+
+			if (!Array.isArray(suggestions) || suggestions.length === 0) {
+				hideResults();
+				return;
+			}
+
+			suggestions.forEach((item) => {
+				const counterparty = item?.counterparty || {};
+				const button = document.createElement('button');
+				button.type = 'button';
+				button.className = 'order-participant-lookup__result';
+				button.innerHTML = `
+					<span class="order-participant-lookup__result-title">${counterparty.label || counterparty.name || 'Контрагент'}</span>
+					<span class="order-participant-lookup__result-meta">${counterparty.phone || 'Телефон не указан'}${item.source === 'dadata' ? ' · DaData' : ' · База'}</span>
+				`;
+
+				button.addEventListener('click', () => {
+					applyCustomer(counterparty);
+					input.value = counterparty.name || counterparty.short_name || counterparty.full_name || '';
+					hideResults();
+					showStatus(item.source === 'dadata' ? 'Данные из DaData подставлены в форму. Сохранение произойдёт только после сохранения заявки.' : 'Заказчик выбран из базы.', 'success');
+				});
+
+				resultsNode.appendChild(button);
+			});
+
+			resultsNode.hidden = false;
+		};
+
+		const executeSearch = async () => {
+			const query = input.value.trim();
+
+			if (query.length < 2) {
+				hideResults();
+				showStatus('');
+				return;
+			}
+
+			showStatus('Ищу совпадения в базе и через DaData...');
+
+			try {
+				const url = new URL(searchUrl, window.location.origin);
+				url.searchParams.set('query', query);
+				url.searchParams.set('role', 'customer');
+
+				const response = await fetch(url.toString(), {
+					headers: {
+						Accept: 'application/json',
+						'X-Requested-With': 'XMLHttpRequest',
+					},
+				});
+
+				const json = await response.json();
+
+				if (!response.ok) {
+					throw new Error(json?.message || 'Не удалось выполнить поиск заказчика.');
+				}
+
+				renderResults(json?.suggestions || []);
+
+				const hasSuggestions = Array.isArray(json?.suggestions) && json.suggestions.length > 0;
+				const emptyMessage = json?.dadata_error
+					? `DaData недоступен: ${json.dadata_error}`
+					: 'Ничего не найдено.';
+
+				showStatus(hasSuggestions ? 'Выберите подходящий вариант.' : emptyMessage, hasSuggestions ? 'success' : 'error');
+			} catch (error) {
+				hideResults();
+				showStatus(error instanceof Error ? error.message : 'Не удалось выполнить поиск заказчика.', 'error');
+			}
+		};
+
+		const executeAutofill = async () => {
+			if (!autofillUrl) {
+				showStatus('Маршрут автозаполнения не настроен.', 'error');
+				return;
+			}
+
+			const rawQuery = (customerInnInput instanceof HTMLInputElement && customerInnInput.value.trim() !== '' ? customerInnInput.value : input.value).trim();
+			const digits = rawQuery.replace(/\D+/g, '');
+
+			if (![10, 12, 13, 15].includes(digits.length)) {
+				showStatus('Для автозаполнения укажите ИНН или ОГРН.', 'error');
+				return;
+			}
+
+			hideResults();
+			showStatus('Запрашиваю данные заказчика из DaData...');
+
+			if (autofillButton instanceof HTMLButtonElement) {
+				autofillButton.disabled = true;
+			}
+
+			try {
+				const response = await fetch(autofillUrl, {
+					method: 'POST',
+					headers: {
+						'Accept': 'application/json',
+						'Content-Type': 'application/json',
+						'X-Requested-With': 'XMLHttpRequest',
+						'X-CSRF-TOKEN': csrfToken,
+					},
+					body: JSON.stringify({ query: digits }),
+				});
+
+				const json = await response.json();
+
+				if (!response.ok) {
+					throw new Error(json?.message || 'Не удалось получить данные заказчика из DaData.');
+				}
+
+				applyCustomerAutofill(json?.data || {});
+				showStatus(json?.message || 'Данные заказчика подставлены из DaData.', 'success');
+			} catch (error) {
+				showStatus(error instanceof Error ? error.message : 'Не удалось получить данные заказчика из DaData.', 'error');
+			} finally {
+				if (autofillButton instanceof HTMLButtonElement) {
+					autofillButton.disabled = false;
+				}
+			}
+		};
+
+		input.addEventListener('input', () => {
+			window.clearTimeout(debounceTimer);
+			debounceTimer = window.setTimeout(executeSearch, 300);
+		});
+
+		input.addEventListener('focus', () => {
+			if (input.value.trim().length >= 2) {
+				executeSearch();
+			}
+		});
+
+		autofillButton?.addEventListener('click', () => {
+			executeAutofill();
+		});
+
+		clearButton?.addEventListener('click', () => {
+			input.value = '';
+			hideResults();
+			showStatus('Поиск очищен. Текущие значения полей можно отредактировать вручную.');
+
+			if (customerIdInput instanceof HTMLInputElement) {
+				customerIdInput.value = '';
+			}
+
+			if (customerCounterpartyIdInput instanceof HTMLInputElement) {
+				customerCounterpartyIdInput.value = '';
+			}
+
+			if (customerContactIdInput instanceof HTMLInputElement) {
+				customerContactIdInput.value = '';
+			}
+
+			if (customerContactNameInput instanceof HTMLInputElement) {
+				customerContactNameInput.value = '';
+			}
+
+			if (customerPhoneInput instanceof HTMLInputElement) {
+				customerPhoneInput.value = '';
+			}
+
+			if (customerEmailInput instanceof HTMLInputElement) {
+				customerEmailInput.value = '';
+			}
+
+			if (customerInnInput instanceof HTMLInputElement) {
+				customerInnInput.value = '';
+			}
+
+			applyCustomerLegalAddress({}, { preserveEmpty: false });
+		});
+
+		document.addEventListener('click', (event) => {
+			if (!lookup.contains(event.target)) {
+				hideResults();
+			}
+		});
+	});
+};
+
+initOrderCustomerLookup();
+
 const initOrderRouteGeocoding = () => {
 	const forms = document.querySelectorAll('.order-edit-form-card');
 
@@ -342,6 +1232,7 @@ const initOrderRouteGeocoding = () => {
 		const getInput = (name) => form.querySelector(`[data-route-input="${name}"]`);
 		const getCoord = (name) => form.querySelector(`[data-route-coord="${name}"]`);
 		const getPointNode = (name) => form.querySelector(`[data-route-point="${name}"]`);
+		const getDistanceInput = () => form.querySelector('[data-route-distance-input]');
 
 		const setStatus = (message, type = 'default') => {
 			if (!statusNode) {
@@ -378,6 +1269,20 @@ const initOrderRouteGeocoding = () => {
 			pointNode.textContent = `Точка: ${latNumber.toFixed(6)}, ${lngNumber.toFixed(6)}`;
 		};
 
+		const updateDistanceValue = (distanceKm) => {
+			const distanceInput = getDistanceInput();
+
+			if (!(distanceInput instanceof HTMLInputElement)) {
+				return;
+			}
+
+			const distanceNumber = Number.parseFloat(`${distanceKm}`);
+
+			distanceInput.value = Number.isFinite(distanceNumber)
+				? `${Math.round(distanceNumber)}`
+				: '';
+		};
+
 		const clearPointCoordinates = (pointKey) => {
 			const latInput = getCoord(`${pointKey}_lat`);
 			const lngInput = getCoord(`${pointKey}_lng`);
@@ -411,7 +1316,7 @@ const initOrderRouteGeocoding = () => {
 		};
 
 		const markRouteCoordinatesAsStale = () => {
-			setStatus('Маршрут изменён. Определите точки заново или сохраните заявку — координаты будут пересчитаны автоматически.');
+			setStatus('Маршрут изменён. Определите точки заново или сохраните заявку — координаты и расстояние будут пересчитаны автоматически.');
 		};
 
 		[
@@ -428,6 +1333,7 @@ const initOrderRouteGeocoding = () => {
 
 			input.addEventListener('input', () => {
 				clearPointCoordinates(pointKey);
+				updateDistanceValue(null);
 				markRouteCoordinatesAsStale();
 			});
 		});
@@ -494,8 +1400,16 @@ const initOrderRouteGeocoding = () => {
 
 				updatePointText('from', payload.from?.lat, payload.from?.lng);
 				updatePointText('to', payload.to?.lat, payload.to?.lng);
+				updateDistanceValue(payload.distance_km);
 
-				setStatus('Координаты маршрута успешно определены.', 'success');
+				const distanceLabel = Number.isFinite(Number.parseFloat(`${payload.distance_km ?? ''}`))
+					? ` Расстояние: ${Math.round(Number.parseFloat(`${payload.distance_km}`))} км.`
+					: '';
+				const distanceSourceLabel = payload.distance_source === 'yandex-routing'
+					? ' Расчёт выполнен по дорогам.'
+					: ' Router API недоступен, использовано расстояние по прямой.';
+
+				setStatus(`Координаты маршрута успешно определены.${distanceLabel}${distanceSourceLabel}`, payload.distance_source === 'yandex-routing' ? 'success' : 'warning');
 			} catch (error) {
 				setStatus(error instanceof Error ? error.message : 'Ошибка геокодирования маршрута.', 'error');
 			} finally {

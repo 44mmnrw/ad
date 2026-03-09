@@ -13,6 +13,13 @@ class Counterparty extends Model
 
     protected $guarded = [];
 
+    protected $casts = [
+        'legal_address_data' => 'array',
+        'legal_address_invalid' => 'boolean',
+        'legal_geo_lat' => 'decimal:7',
+        'legal_geo_lon' => 'decimal:7',
+    ];
+
     public function typeRef(): BelongsTo
     {
         return $this->belongsTo(CounterpartyType::class, 'type');

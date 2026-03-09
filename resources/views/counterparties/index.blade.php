@@ -23,13 +23,15 @@
             <div class="cp-alert cp-alert--success" role="status">{{ session('status') }}</div>
         @endif
 
-        <form class="cp-filters" action="{{ route('counterparties.index') }}" method="get" role="search" aria-label="Фильтры контрагентов">
+        <form class="cp-filters" action="{{ route('counterparties.index') }}" method="get" role="search" aria-label="Фильтры контрагентов" data-counterparty-search-form data-counterparty-suggest-url="{{ route('counterparties.search.suggest') }}">
             <label class="cp-input cp-input--search" for="counterparties-search">
                 <span class="cp-input__icon" aria-hidden="true">
                     <svg viewBox="0 0 20 20" focusable="false"><use href="/icons/sprite.svg#icon-search"></use></svg>
                 </span>
                 <input id="counterparties-search" type="search" name="search" value="{{ $search }}" placeholder="Поиск по названию, ИНН, телефону...">
+                <div class="cp-search-suggest" data-counterparty-suggest-results hidden></div>
             </label>
+            <p class="cp-search-suggest__status" data-counterparty-suggest-status hidden></p>
 
             <label class="cp-input" for="counterparties-type" aria-label="Тип контрагента">
                 <select id="counterparties-type" name="type">

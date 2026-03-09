@@ -245,9 +245,9 @@
                         <h3>Грузоперевозчик</h3>
                     </div>
                     <p class="person-card__label">Название</p>
-                    <p class="person-card__value">ООО "ТрансЛогистик"</p>
+                    <p class="person-card__value">{{ $order['carrier']['name'] ?? '—' }}</p>
                     <p class="person-card__label">Телефон</p>
-                    <p class="person-card__value">+7 (495) 100-20-30</p>
+                    <p class="person-card__value">{{ $order['carrier']['phone'] ?? '—' }}</p>
                     <div class="person-card__actions">
                         <button class="ad-btn" type="button">
                             <svg aria-hidden="true"><use href="/icons/sprite.svg#icon-doc-phone"></use></svg>
